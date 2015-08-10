@@ -98,7 +98,16 @@ impl Dispatcher {
                         self.name_reply(msg);
                     }
                     Code::RplEndofnames => {
-                        self.end_of_names(msg);
+                        self.listener.channel_join(&mut self.state, &msg.args[0]);
+                    }
+                    Code::Join => {
+                        self.join(msg);
+                    }
+                    Code::Part => {
+                        self.part(msg);
+                    }
+                    Code::Quit => {
+                        self.quit(msg);
                     }
                     _ => {}
                 }
@@ -126,8 +135,60 @@ impl Dispatcher {
         }
     }
 
-    fn end_of_names(&mut self, msg: &Message) {
-        self.listener.channel_join(&mut self.state, &msg.args[0]);
+    fn join(&mut self, msg: &Message) {
+        if msg.args.len() >= 1 {
+            if let Some(ref prefix) = msg.prefix {
+                match *prefix {
+                    Prefix::User(ref user) => {
+                        let channel_name = &msg.args[0];
+                        let channel_id = channel_name.to_lowercase();
+                        if let Some(channel) = self.state.channels.get_mut(&channel_id) {
+                            channel.users.push(user.nickname.to_owned());
+                        }
+                        if self.state.channels.contains_key(&channel_id) {
+                            self.listener.user_join(&mut self.state, channel_name, &user.nickname);
+                        }
+                    }
+                    _ => {}
+                }
+            }
+        }
+    }
+
+    fn part(&mut self, msg: &Message) {
+        if msg.args.len() >= 1 {
+            if let Some(ref prefix) = msg.prefix {
+                match *prefix {
+                    Prefix::User(ref user) => {
+                        let channel_name = &msg.args[0];
+                        let channel_id = channel_name.to_lowercase();
+                        if let Some(channel) = self.state.channels.get_mut(&channel_id) {
+                            if let Some(pos) = channel.users.iter().position(|u| u == &user.nickname) {
+                                channel.users.remove(pos);
+                            }
+                        }
+                        self.listener.user_part(&mut self.state, channel_name, &user.nickname);
+                    }
+                    _ => {}
+                }
+            }
+        }
+    }
+
+    fn quit(&mut self, msg: &Message) {
+        if let Some(ref prefix) = msg.prefix {
+            match *prefix {
+                Prefix::User(ref user) => {
+                    for (_, channel) in self.state.channels.iter_mut() {
+                        if let Some(pos) = channel.users.iter().position(|u| u == &user.nickname) {
+                            channel.users.remove(pos);
+                        }
+                    }
+                    self.listener.user_quit(&mut self.state, &user.nickname);
+                }
+                _ => {}
+            }
+        }
     }
 
 }
@@ -145,6 +206,18 @@ pub trait Listener {
 
     /// When the client sucessfully joins a channel.
     #[allow(unused_variables)]
-    fn channel_join(&mut self, state: &mut State, name: &str) {}
+    fn channel_join(&mut self, state: &mut State, channel: &str) {}
+
+    /// When a user joins a channel we are listening on.
+    #[allow(unused_variables)]
+    fn user_join(&mut self, state: &mut State, channel: &str, nickname :&str) {}
+
+    /// When a user parts a channel we are listening on.
+    #[allow(unused_variables)]
+    fn user_part(&mut self, state: &mut State, channel: &str, nickname :&str) {}
+
+    /// When a user quits.
+    #[allow(unused_variables)]
+    fn user_quit(&mut self, state: &mut State, nickname: &str) {}
 
 }
