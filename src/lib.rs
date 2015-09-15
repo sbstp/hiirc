@@ -129,51 +129,51 @@ impl Irc {
     }
 
     /// NICK command.
-    pub fn nick(&self, nickname: &str) -> Result<(), Error> {
-        self.raw(format!("NICK {}", nickname))
+    pub fn nick<S: AsRef<str>>(&self, nickname: S) -> Result<(), Error> {
+        self.raw(format!("NICK {}", nickname.as_ref()))
     }
 
     /// USER command.
-    pub fn user(&self, username: &str, realname: &str) -> Result<(), Error> {
-        self.raw(format!("USER {} 8 * :{}", username, realname))
+    pub fn user<S: AsRef<str>>(&self, username: S, realname: S) -> Result<(), Error> {
+        self.raw(format!("USER {} 8 * :{}", username.as_ref(), realname.as_ref()))
     }
 
     /// PING command.
-    pub fn ping(&self, server: &str) -> Result<(), Error> {
-        self.raw(format!("PING {}", server))
+    pub fn ping<S: AsRef<str>>(&self, server: S) -> Result<(), Error> {
+        self.raw(format!("PING {}", server.as_ref()))
     }
 
     /// PONG command.
-    pub fn pong(&self, server: &str) -> Result<(), Error> {
-        self.raw(format!("PONG {}", server))
+    pub fn pong<S: AsRef<str>>(&self, server: S) -> Result<(), Error> {
+        self.raw(format!("PONG {}", server.as_ref()))
     }
 
     /// PRIVMSG command.
-    pub fn privmsg(&self, target: &str, text: &str) -> Result<(), Error> {
-        self.raw(format!("PRIVMSG {} :{}", target, text))
+    pub fn privmsg<S: AsRef<str>>(&self, target: S, text: S) -> Result<(), Error> {
+        self.raw(format!("PRIVMSG {} :{}", target.as_ref(), text.as_ref()))
     }
 
     /// JOIN command.
-    pub fn join(&self, channel: &str, password: Option<&str>) -> Result<(), Error> {
+    pub fn join<S: AsRef<str>>(&self, channel: S, password: Option<S>) -> Result<(), Error> {
         match password {
-            None => self.raw(format!("JOIN {}", channel)),
-            Some(password) => self.raw(format!("JOIN {} {}", channel, password)),
+            None => self.raw(format!("JOIN {}", channel.as_ref())),
+            Some(password) => self.raw(format!("JOIN {} {}", channel.as_ref(), password.as_ref())),
         }
     }
 
     /// PART command.
-    pub fn part(&self, channel: &str, message: Option<&str>) -> Result<(), Error> {
+    pub fn part<S: AsRef<str>>(&self, channel: S, message: Option<S>) -> Result<(), Error> {
         match message {
-            None => self.raw(format!("PART {}", channel)),
-            Some(message) => self.raw(format!("PART {} :{}", channel, message)),
+            None => self.raw(format!("PART {}", channel.as_ref())),
+            Some(message) => self.raw(format!("PART {} :{}", channel.as_ref(), message.as_ref())),
         }
     }
 
     /// QUIT command.
-    pub fn quit(&self, message: Option<&str>) -> Result<(), Error> {
+    pub fn quit<S: AsRef<str>>(&self, message: Option<S>) -> Result<(), Error> {
         match message {
             None => self.raw(format!("QUIT :No message")),
-            Some(message) => self.raw(format!("QUIT :{}", message)),
+            Some(message) => self.raw(format!("QUIT :{}", message.as_ref())),
         }
     }
 
