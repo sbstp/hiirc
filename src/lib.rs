@@ -197,7 +197,6 @@ pub fn dispatch<L: Listener>(listener: L, settings: Settings) -> Result<(), Erro
         }
     } else {
         for event in reader.iter() {
-            println!("{:?}", &event);
             feed(&mut listener, &mut irc, &event);
         }
     }
