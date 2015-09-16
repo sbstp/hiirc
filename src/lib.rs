@@ -236,6 +236,9 @@ fn feed<L: Listener>(listener: &mut Box<L>, irc: &mut Irc, event: &Event) {
                 Code::Part => {
                     part(listener, irc, msg);
                 }
+                Code::Privmsg => {
+                    privmsg(listener, irc, msg);
+                }
                 Code::Quit => {
                     quit(listener, irc, msg);
                 }
@@ -305,6 +308,23 @@ fn part<L: Listener>(listener: &mut Box<L>, irc: &mut Irc, msg: &Message) {
     }
 }
 
+fn privmsg<L: Listener>(listener: &mut Box<L>, irc: &mut Irc, msg: &Message) {
+    if let Some(ref text) = msg.suffix {
+        if let Some(ref prefix) = msg.prefix {
+            match *prefix {
+                Prefix::User(ref user) => {
+                    if msg.args.len() > 0 && msg.args[0].starts_with("#") {
+                        listener.channel_msg(irc, &user.nickname, &msg.args[0], text);
+                    } else {
+                        listener.private_msg(irc, &user.nickname, text);
+                    }
+                }
+                _ => {}
+            }
+        }
+    }
+}
+
 fn quit<L: Listener>(listener: &mut Box<L>, irc: &mut Irc, msg: &Message) {
     if let Some(ref prefix) = msg.prefix {
         match *prefix {
@@ -348,8 +368,12 @@ pub trait Listener {
     #[allow(unused_variables)]
     fn user_quit(&mut self, irc: &mut Irc, nickname: &str) {}
 
+    /// When a channel message is received.
+    #[allow(unused_variables)]
+    fn channel_msg(&mut self, irc: &mut Irc, sender: &str, channel: &str, message: &str) {}
+
     /// When a private message is received.
     #[allow(unused_variables)]
-    fn privmsg(&mut self, irc: &mut Irc, message: &str) {}
+    fn private_msg(&mut self, irc: &mut Irc, sender: &str, message: &str) {}
 
 }
