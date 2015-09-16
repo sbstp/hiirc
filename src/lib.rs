@@ -2,11 +2,13 @@
 #![deny(missing_docs)]
 
 extern crate loirc;
+#[macro_use]
+mod macros;
 
 use std::collections::HashMap;
 use std::io;
 
-pub use loirc::{connect, ActivityMonitor, Code, Event, Message, MonitorSettings, Prefix, Reader, ReconnectionSettings, Writer};
+pub use loirc::{connect, ActivityMonitor, Code, Duration, Event, Message, MonitorSettings, Prefix, Reader, ReconnectionSettings, User, Writer};
 
 /// Represents a channel.
 #[derive(Debug)]
@@ -103,6 +105,18 @@ impl Irc {
     /// Get a channel by name.
     pub fn get_channel(&self, chan: &str) -> Option<&Channel> {
         self.channels.get(&chan.to_lowercase())
+    }
+
+    fn add_user(&mut self, channel_id: &str, nickname: &str) {
+        let channel = some_or_return!(self.channels.get_mut(channel_id));
+        channel.users.push(nickname.to_owned());
+    }
+
+    fn del_user(&mut self, channel_id: &str, nickname: &str) {
+        let channel = some_or_return!(self.channels.get_mut(channel_id));
+        if let Some(pos) = channel.users.iter().position(|u| u == nickname) {
+            channel.users.remove(pos);
+        }
     }
 
     /// Check if the underlying connection is closed.
@@ -225,10 +239,10 @@ fn feed<L: Listener>(listener: &mut Box<L>, irc: &mut Irc, event: &Event) {
                     listener.welcome(irc);
                 }
                 Code::RplNamreply => {
-                    name_reply(listener, irc, msg);
+                    name_reply(irc, msg);
                 }
                 Code::RplEndofnames => {
-                    listener.channel_join(irc, &msg.args[1]);
+                    end_name_reply(listener, irc, msg);
                 }
                 Code::Join => {
                     join(listener, irc, msg);
@@ -249,9 +263,10 @@ fn feed<L: Listener>(listener: &mut Box<L>, irc: &mut Irc, event: &Event) {
     }
 }
 
-fn name_reply<L: Listener>(listener: &mut Box<L>, irc: &mut Irc, msg: &Message) {
-    let channel_name = &msg.args[2];
+fn name_reply(irc: &mut Irc, msg: &Message) {
+    let channel_name = some_or_return!(msg.args.get(2));
     let channel_id = channel_name.to_lowercase();
+    let user_list = some_or_return!(msg.suffix.as_ref());
 
     if !irc.channels.contains_key(&channel_id) {
         irc.channels.insert(channel_id.clone(), Channel {
@@ -260,85 +275,57 @@ fn name_reply<L: Listener>(listener: &mut Box<L>, irc: &mut Irc, msg: &Message) 
         });
     }
 
-    if let Some(ref suffix) = msg.suffix {
-        let channel = irc.channels.get_mut(&channel_id).unwrap();
-        for nick in suffix.split(" ") {
-            channel.users.push(nick.to_owned());
-        }
+    let channel = some_or_return!(irc.channels.get_mut(&channel_id));
+    for nick in user_list.split(" ") {
+        channel.users.push(nick.to_owned());
     }
+}
+
+fn end_name_reply<L: Listener>(listener: &mut Box<L>, irc: &mut Irc, msg: &Message) {
+    let channel_name = some_or_return!(msg.args.get(1));
+    listener.channel_join(irc, channel_name);
 }
 
 fn join<L: Listener>(listener: &mut Box<L>, irc: &mut Irc, msg: &Message) {
-    if msg.args.len() >= 1 {
-        if let Some(ref prefix) = msg.prefix {
-            match *prefix {
-                Prefix::User(ref user) => {
-                    let channel_name = &msg.args[0];
-                    let channel_id = channel_name.to_lowercase();
-                    if let Some(channel) = irc.channels.get_mut(&channel_id) {
-                        channel.users.push(user.nickname.to_owned());
-                    }
-                    if irc.channels.contains_key(&channel_id) {
-                        listener.user_join(irc, channel_name, &user.nickname);
-                    }
-                }
-                _ => {}
-            }
-        }
-    }
+    let user = user_or_return!(msg.prefix);
+    let channel_name = some_or_return!(msg.args.get(0));
+    let channel_id = channel_name.to_lowercase();
+
+    irc.add_user(&channel_id, &user.nickname);
+    listener.user_join(irc, channel_name, &user.nickname);
 }
 
 fn part<L: Listener>(listener: &mut Box<L>, irc: &mut Irc, msg: &Message) {
-    if msg.args.len() >= 1 {
-        if let Some(ref prefix) = msg.prefix {
-            match *prefix {
-                Prefix::User(ref user) => {
-                    let channel_name = &msg.args[0];
-                    let channel_id = channel_name.to_lowercase();
-                    if let Some(channel) = irc.channels.get_mut(&channel_id) {
-                        if let Some(pos) = channel.users.iter().position(|u| u == &user.nickname) {
-                            channel.users.remove(pos);
-                        }
-                    }
-                    listener.user_part(irc, channel_name, &user.nickname);
-                }
-                _ => {}
-            }
-        }
-    }
+    let user = user_or_return!(msg.prefix);
+    let channel_name = some_or_return!(msg.args.get(0));
+    let channel_id = channel_name.to_lowercase();
+
+    irc.del_user(&channel_id, &user.nickname);
+    listener.user_part(irc, channel_name, &user.nickname)
 }
 
 fn privmsg<L: Listener>(listener: &mut Box<L>, irc: &mut Irc, msg: &Message) {
-    if let Some(ref text) = msg.suffix {
-        if let Some(ref prefix) = msg.prefix {
-            match *prefix {
-                Prefix::User(ref user) => {
-                    if msg.args.len() > 0 && msg.args[0].starts_with("#") {
-                        listener.channel_msg(irc, &user.nickname, &msg.args[0], text);
-                    } else {
-                        listener.private_msg(irc, &user.nickname, text);
-                    }
-                }
-                _ => {}
-            }
-        }
+    let user = user_or_return!(msg.prefix);
+    let text = some_or_return!(msg.suffix.as_ref());
+    let source = some_or_return!(msg.args.get(0));
+
+    if source.starts_with("#") {
+        listener.channel_msg(irc, &user.nickname, source, text);
+    } else {
+        listener.private_msg(irc, &user.nickname, text);
     }
 }
 
 fn quit<L: Listener>(listener: &mut Box<L>, irc: &mut Irc, msg: &Message) {
-    if let Some(ref prefix) = msg.prefix {
-        match *prefix {
-            Prefix::User(ref user) => {
-                for (_, channel) in irc.channels.iter_mut() {
-                    if let Some(pos) = channel.users.iter().position(|u| u == &user.nickname) {
-                        channel.users.remove(pos);
-                    }
-                }
-                listener.user_quit(irc, &user.nickname);
-            }
-            _ => {}
+    let user = user_or_return!(msg.prefix);
+
+    for (_, channel) in irc.channels.iter_mut() {
+        if let Some(pos) = channel.users.iter().position(|u| u == &user.nickname) {
+            channel.users.remove(pos);
         }
     }
+
+    listener.user_quit(irc, &user.nickname);
 }
 
 /// Implement this trait to handle events.
