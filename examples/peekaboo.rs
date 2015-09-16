@@ -21,17 +21,17 @@ impl<'a> Peekaboo<'a> {
 impl<'a> Listener for Peekaboo<'a> {
 
     /// On any event we receive, print the Debug of it.
-    fn any(&mut self, _: &mut Irc, event: &Event) {
+    fn any(&mut self, _: &Irc, event: &Event) {
         println!("{:?}", &event);
     }
 
     /// When the welcome message is received, join the channel.
-    fn welcome(&mut self, irc: &mut Irc) {
+    fn welcome(&mut self, irc: &Irc) {
         irc.join(self.channel, None);
     }
 
     /// When the channel is joined, say "peekaboo" and quit.
-    fn channel_join(&mut self, irc: &mut Irc, channel: &str) {
+    fn channel_join(&mut self, irc: &Irc, channel: &str) {
         irc.privmsg(channel, "peekaboo");
         irc.quit(Some("peekaboo"));
     }
