@@ -17,6 +17,8 @@ pub struct Channel {
     pub name: String,
     /// List of users by nickname.
     pub users: Vec<String>,
+    /// Topic of the channel.
+    pub topic: Option<String>,
 }
 
 /// Status of the connection.
@@ -103,8 +105,33 @@ impl Irc {
     }
 
     /// Get a channel by name.
-    pub fn get_channel(&self, chan: &str) -> Option<&Channel> {
-        self.channels.get(&chan.to_lowercase())
+    pub fn get_channel_by_name(&self, name: &str) -> Option<&Channel> {
+        self.get_channel_by_id(&name.to_lowercase())
+    }
+
+    /// Get a channel by id.
+    pub fn get_channel_by_id(&self, id: &str) -> Option<&Channel> {
+        self.channels.get(id)
+    }
+
+    // Ensure a channel if it does not exist.
+    fn ensure_channel_exists(&mut self, name: &str, id: &str) {
+        if !self.channels.contains_key(id) {
+            self.channels.insert(id.to_owned(), Channel {
+                name: name.to_owned(),
+                users: Vec::new(),
+                topic: None,
+            });
+        }
+    }
+
+    fn set_channel_topic(&mut self, channel_id: &str, topic: &str) {
+        let channel = some_or_return!(self.channels.get_mut(channel_id));
+        channel.topic = if topic.len() == 0 {
+            None
+        } else {
+            Some(topic.to_owned())
+        };
     }
 
     fn add_user(&mut self, channel_id: &str, nickname: &str) {
@@ -191,6 +218,19 @@ impl Irc {
         }
     }
 
+    /// Retrive the topic of a given channel. The topic event will receive the information.
+    pub fn get_topic<S: AsRef<str>>(&self, channel: S) -> Result<(), Error> {
+        self.raw(format!("TOPIC {}", channel.as_ref()))
+    }
+
+    /// Set the topic of a channel.
+    ///
+    /// To remove the topic of a channel, use an empty topic string.
+    /// It will also trigger a topic change event.
+    pub fn set_topic<C: AsRef<str>, T: AsRef<str>>(&self, channel: C, topic: T) -> Result<(), Error> {
+        self.raw(format!("TOPIC {} :{}", channel.as_ref(), topic.as_ref()))
+    }
+
 }
 
 /// Create an irc client with the listener and settings.
@@ -244,6 +284,15 @@ fn feed<L: Listener>(listener: &mut Box<L>, irc: &mut Irc, event: &Event) {
                 Code::RplEndofnames => {
                     end_name_reply(listener, irc, msg);
                 }
+                Code::Topic => {
+                    topic(listener, irc, msg);
+                }
+                Code::RplTopic => {
+                    rpl_topic(listener, irc, msg);
+                }
+                Code::RplNotopic => {
+                    rpl_no_topic(listener, irc, msg);
+                }
                 Code::Join => {
                     join(listener, irc, msg);
                 }
@@ -268,13 +317,7 @@ fn name_reply(irc: &mut Irc, msg: &Message) {
     let channel_id = channel_name.to_lowercase();
     let user_list = some_or_return!(msg.suffix.as_ref());
 
-    if !irc.channels.contains_key(&channel_id) {
-        irc.channels.insert(channel_id.clone(), Channel {
-            name: channel_name.to_owned(),
-            users: Vec::new(),
-        });
-    }
-
+    irc.ensure_channel_exists(channel_name, &channel_id);
     let channel = some_or_return!(irc.channels.get_mut(&channel_id));
     for nick in user_list.split(" ") {
         channel.users.push(nick.to_owned());
@@ -284,6 +327,41 @@ fn name_reply(irc: &mut Irc, msg: &Message) {
 fn end_name_reply<L: Listener>(listener: &mut Box<L>, irc: &mut Irc, msg: &Message) {
     let channel_name = some_or_return!(msg.args.get(1));
     listener.channel_join(irc, channel_name);
+}
+
+fn topic<L: Listener>(listener: &mut Box<L>, irc: &mut Irc, msg: &Message) {
+    let topic = some_or_return!(msg.suffix.as_ref());
+    let channel_name = some_or_return!(msg.args.get(0));
+    let channel_id = channel_name.to_lowercase();
+
+    irc.ensure_channel_exists(&channel_id, channel_name);
+    irc.set_channel_topic(&channel_id, topic);
+
+    let channel = some_or_return!(irc.get_channel_by_id(&channel_id));
+    listener.topic_change(&irc, channel, channel.topic.as_ref().map(|t| &t[..]));
+}
+
+fn rpl_topic<L: Listener>(listener: &mut Box<L>, irc: &mut Irc, msg: &Message) {
+    let topic = some_or_return!(msg.suffix.as_ref());
+    let channel_name = some_or_return!(msg.args.get(1));
+    let channel_id = channel_name.to_lowercase();
+
+    irc.ensure_channel_exists(&channel_id, channel_name);
+    irc.set_channel_topic(&channel_id, topic);
+
+    let channel = some_or_return!(irc.get_channel_by_id(&channel_id));
+    listener.topic(&irc, channel, channel.topic.as_ref().map(|t| &t[..]));
+}
+
+fn rpl_no_topic<L: Listener>(listener: &mut Box<L>, irc: &mut Irc, msg: &Message) {
+    let channel_name = some_or_return!(msg.args.get(0));
+    let channel_id = channel_name.to_lowercase();
+
+    irc.ensure_channel_exists(channel_name, &channel_id);
+    irc.set_channel_topic(&channel_id, "");
+
+    let channel = some_or_return!(irc.get_channel_by_id(&channel_id));
+    listener.topic(&irc, channel, channel.topic.as_ref().map(|t| &t[..]));
 }
 
 fn join<L: Listener>(listener: &mut Box<L>, irc: &mut Irc, msg: &Message) {
@@ -362,5 +440,18 @@ pub trait Listener {
     /// When a private message is received.
     #[allow(unused_variables)]
     fn private_msg(&mut self, irc: &Irc, sender: &str, message: &str) {}
+
+    /// Reply to a topic command or when joining a channel.
+    ///
+    /// Note that this event might be called before the channel's username list is populated.
+    /// If a channel has no topic, this event will not be fired when you join a channel.
+    /// It's safe to assume that a channel has no topic if this event is not fired when joining.
+    /// If you use the `topic` method however, you will always get a result.
+    #[allow(unused_variables)]
+    fn topic(&mut self, irc: &Irc, channel: &Channel, topic: Option<&str>) {}
+
+    /// When the topic of is changed by someone.
+    #[allow(unused_variables)]
+    fn topic_change(&mut self, irc: &Irc, channel: &Channel, topic: Option<&str>) {}
 
 }
