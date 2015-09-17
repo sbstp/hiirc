@@ -239,173 +239,184 @@ impl Irc {
 
 /// Create an irc client with the listener and settings.
 pub fn dispatch<L: Listener>(listener: L, settings: Settings) -> Result<(), Error> {
-    let mut listener = Box::new(listener);
     let reco_settings = settings.reco_settings.unwrap_or(ReconnectionSettings::DoNotReconnect);
     let (writer, reader) = try!(connect(settings.addr, reco_settings));
 
-    let mut irc = Irc::new(writer.clone());
+    let irc = Irc::new(writer.clone());
     try!(irc.nick(settings.nickname));
     try!(irc.user(settings.username, settings.realname));
 
-    if let Some(mon_settings) = settings.mon_settings {
-        let am = ActivityMonitor::new(&writer, mon_settings);
-        for event in reader.iter() {
-            am.feed(&event);
-            feed(&mut listener, &mut irc, &event);
-        }
-    } else {
-        for event in reader.iter() {
-            feed(&mut listener, &mut irc, &event);
-        }
+    let mut dispatch = Dispatch {
+        am: settings.mon_settings.map(|s| ActivityMonitor::new(&writer, s)),
+        listener: Box::new(listener),
+        irc: irc,
+    };
+
+    for event in reader.iter() {
+        dispatch.feed(&event);
     }
 
     Ok(())
 }
 
-/// Feed an event to the dispatcher.
-fn feed<L: Listener>(listener: &mut Box<L>, irc: &mut Irc, event: &Event) {
-    listener.any(irc, event);
+struct Dispatch<'a> {
+    am: Option<ActivityMonitor>,
+    listener: Box<Listener + 'a>,
+    irc: Irc,
+}
 
-    match *event {
-        Event::Closed(reason) => {
-            irc.status = ConnectionStatus::Closed(reason);
+impl<'a> Dispatch<'a> {
+
+    /// Feed an event to the dispatcher.
+    pub fn feed(&mut self, event: &Event) {
+        if let Some(am) = self.am.as_ref() {
+            am.feed(event);
         }
-        Event::Disconnected => {
-            irc.status = ConnectionStatus::Disconnected;
-            irc.channels.clear();
+
+        self.listener.any(&self.irc, event);
+
+        match *event {
+            Event::Closed(reason) => {
+                self.irc.status = ConnectionStatus::Closed(reason);
+            }
+            Event::Disconnected => {
+                self.irc.status = ConnectionStatus::Disconnected;
+                self.irc.channels.clear();
+            }
+            Event::Reconnecting => {
+                self.irc.status = ConnectionStatus::Reconnecting;
+            }
+            Event::Message(ref msg) => {
+                match msg.code {
+                    Code::RplWelcome => {
+                        self.listener.welcome(&self.irc);
+                    }
+                    Code::RplNamreply => {
+                        self.name_reply(msg);
+                    }
+                    Code::RplEndofnames => {
+                        self.end_name_reply(msg);
+                    }
+                    Code::Topic => {
+                        self.topic(msg);
+                    }
+                    Code::RplTopic => {
+                        self.rpl_topic(msg);
+                    }
+                    Code::RplNotopic => {
+                        self.rpl_no_topic(msg);
+                    }
+                    Code::Join => {
+                        self.join(msg);
+                    }
+                    Code::Part => {
+                        self.part(msg);
+                    }
+                    Code::Privmsg => {
+                        self.privmsg(msg);
+                    }
+                    Code::Quit => {
+                        self.quit(msg);
+                    }
+                    _ => {}
+                }
+            }
+            _ => {}
         }
-        Event::Reconnecting => {
-            irc.status = ConnectionStatus::Reconnecting;
+    }
+
+    fn name_reply(&mut self, msg: &Message) {
+        let channel_name = some_or_return!(msg.args.get(2));
+        let channel_id = channel_name.to_lowercase();
+        let user_list = some_or_return!(msg.suffix.as_ref());
+
+        self.irc.ensure_channel_exists(channel_name, &channel_id);
+        let channel = some_or_return!(self.irc.channels.get_mut(&channel_id));
+        for nick in user_list.split(" ") {
+            channel.users.push(nick.to_owned());
         }
-        Event::Message(ref msg) => {
-            match msg.code {
-                Code::RplWelcome => {
-                    listener.welcome(irc);
-                }
-                Code::RplNamreply => {
-                    name_reply(irc, msg);
-                }
-                Code::RplEndofnames => {
-                    end_name_reply(listener, irc, msg);
-                }
-                Code::Topic => {
-                    topic(listener, irc, msg);
-                }
-                Code::RplTopic => {
-                    rpl_topic(listener, irc, msg);
-                }
-                Code::RplNotopic => {
-                    rpl_no_topic(listener, irc, msg);
-                }
-                Code::Join => {
-                    join(listener, irc, msg);
-                }
-                Code::Part => {
-                    part(listener, irc, msg);
-                }
-                Code::Privmsg => {
-                    privmsg(listener, irc, msg);
-                }
-                Code::Quit => {
-                    quit(listener, irc, msg);
-                }
-                _ => {}
+    }
+
+    fn end_name_reply(&mut self, msg: &Message) {
+        let channel_name = some_or_return!(msg.args.get(1));
+        self.listener.channel_join(&self.irc, channel_name);
+    }
+
+    fn topic(&mut self, msg: &Message) {
+        let topic = some_or_return!(msg.suffix.as_ref());
+        let channel_name = some_or_return!(msg.args.get(0));
+        let channel_id = channel_name.to_lowercase();
+
+        self.irc.ensure_channel_exists(&channel_id, channel_name);
+        self.irc.set_channel_topic(&channel_id, topic);
+
+        let channel = some_or_return!(self.irc.get_channel_by_id(&channel_id));
+        self.listener.topic_change(&self.irc, channel, channel.topic.as_ref().map(|t| &t[..]));
+    }
+
+    fn rpl_topic(&mut self, msg: &Message) {
+        let topic = some_or_return!(msg.suffix.as_ref());
+        let channel_name = some_or_return!(msg.args.get(1));
+        let channel_id = channel_name.to_lowercase();
+
+        self.irc.ensure_channel_exists(&channel_id, channel_name);
+        self.irc.set_channel_topic(&channel_id, topic);
+
+        let channel = some_or_return!(self.irc.get_channel_by_id(&channel_id));
+        self.listener.topic(&self.irc, channel, channel.topic.as_ref().map(|t| &t[..]));
+    }
+
+    fn rpl_no_topic(&mut self, msg: &Message) {
+        let channel_name = some_or_return!(msg.args.get(0));
+        let channel_id = channel_name.to_lowercase();
+
+        self.irc.ensure_channel_exists(channel_name, &channel_id);
+        self.irc.set_channel_topic(&channel_id, "");
+
+        let channel = some_or_return!(self.irc.get_channel_by_id(&channel_id));
+        self.listener.topic(&self.irc, channel, channel.topic.as_ref().map(|t| &t[..]));
+    }
+
+    fn join(&mut self, msg: &Message) {
+        let user = user_or_return!(msg.prefix);
+        let channel_name = some_or_return!(msg.args.get(0));
+        let channel_id = channel_name.to_lowercase();
+
+        self.irc.add_user(&channel_id, &user.nickname);
+        self.listener.user_join(&self.irc, channel_name, &user.nickname);
+    }
+
+    fn part(&mut self, msg: &Message) {
+        let user = user_or_return!(msg.prefix);
+        let channel_name = some_or_return!(msg.args.get(0));
+        let channel_id = channel_name.to_lowercase();
+
+        self.irc.del_user(&channel_id, &user.nickname);
+        self.listener.user_part(&self.irc, channel_name, &user.nickname)
+    }
+
+    fn privmsg(&mut self, msg: &Message) {
+        let user = user_or_return!(msg.prefix);
+        let text = some_or_return!(msg.suffix.as_ref());
+        let source = some_or_return!(msg.args.get(0));
+
+        if source.starts_with("#") {
+            self.listener.channel_msg(&self.irc, &user.nickname, source, text);
+        } else {
+            self.listener.private_msg(&self.irc, &user.nickname, text);
+        }
+    }
+
+    fn quit(&mut self, msg: &Message) {
+        let user = user_or_return!(msg.prefix);
+
+        for (_, channel) in self.irc.channels.iter_mut() {
+            if let Some(pos) = channel.users.iter().position(|u| u == &user.nickname) {
+                channel.users.remove(pos);
             }
         }
-        _ => {}
-    }
-}
 
-fn name_reply(irc: &mut Irc, msg: &Message) {
-    let channel_name = some_or_return!(msg.args.get(2));
-    let channel_id = channel_name.to_lowercase();
-    let user_list = some_or_return!(msg.suffix.as_ref());
-
-    irc.ensure_channel_exists(channel_name, &channel_id);
-    let channel = some_or_return!(irc.channels.get_mut(&channel_id));
-    for nick in user_list.split(" ") {
-        channel.users.push(nick.to_owned());
-    }
-}
-
-fn end_name_reply<L: Listener>(listener: &mut Box<L>, irc: &mut Irc, msg: &Message) {
-    let channel_name = some_or_return!(msg.args.get(1));
-    listener.channel_join(irc, channel_name);
-}
-
-fn topic<L: Listener>(listener: &mut Box<L>, irc: &mut Irc, msg: &Message) {
-    let topic = some_or_return!(msg.suffix.as_ref());
-    let channel_name = some_or_return!(msg.args.get(0));
-    let channel_id = channel_name.to_lowercase();
-
-    irc.ensure_channel_exists(&channel_id, channel_name);
-    irc.set_channel_topic(&channel_id, topic);
-
-    let channel = some_or_return!(irc.get_channel_by_id(&channel_id));
-    listener.topic_change(&irc, channel, channel.topic.as_ref().map(|t| &t[..]));
-}
-
-fn rpl_topic<L: Listener>(listener: &mut Box<L>, irc: &mut Irc, msg: &Message) {
-    let topic = some_or_return!(msg.suffix.as_ref());
-    let channel_name = some_or_return!(msg.args.get(1));
-    let channel_id = channel_name.to_lowercase();
-
-    irc.ensure_channel_exists(&channel_id, channel_name);
-    irc.set_channel_topic(&channel_id, topic);
-
-    let channel = some_or_return!(irc.get_channel_by_id(&channel_id));
-    listener.topic(&irc, channel, channel.topic.as_ref().map(|t| &t[..]));
-}
-
-fn rpl_no_topic<L: Listener>(listener: &mut Box<L>, irc: &mut Irc, msg: &Message) {
-    let channel_name = some_or_return!(msg.args.get(0));
-    let channel_id = channel_name.to_lowercase();
-
-    irc.ensure_channel_exists(channel_name, &channel_id);
-    irc.set_channel_topic(&channel_id, "");
-
-    let channel = some_or_return!(irc.get_channel_by_id(&channel_id));
-    listener.topic(&irc, channel, channel.topic.as_ref().map(|t| &t[..]));
-}
-
-fn join<L: Listener>(listener: &mut Box<L>, irc: &mut Irc, msg: &Message) {
-    let user = user_or_return!(msg.prefix);
-    let channel_name = some_or_return!(msg.args.get(0));
-    let channel_id = channel_name.to_lowercase();
-
-    irc.add_user(&channel_id, &user.nickname);
-    listener.user_join(irc, channel_name, &user.nickname);
-}
-
-fn part<L: Listener>(listener: &mut Box<L>, irc: &mut Irc, msg: &Message) {
-    let user = user_or_return!(msg.prefix);
-    let channel_name = some_or_return!(msg.args.get(0));
-    let channel_id = channel_name.to_lowercase();
-
-    irc.del_user(&channel_id, &user.nickname);
-    listener.user_part(irc, channel_name, &user.nickname)
-}
-
-fn privmsg<L: Listener>(listener: &mut Box<L>, irc: &mut Irc, msg: &Message) {
-    let user = user_or_return!(msg.prefix);
-    let text = some_or_return!(msg.suffix.as_ref());
-    let source = some_or_return!(msg.args.get(0));
-
-    if source.starts_with("#") {
-        listener.channel_msg(irc, &user.nickname, source, text);
-    } else {
-        listener.private_msg(irc, &user.nickname, text);
-    }
-}
-
-fn quit<L: Listener>(listener: &mut Box<L>, irc: &mut Irc, msg: &Message) {
-    let user = user_or_return!(msg.prefix);
-
-    for (_, channel) in irc.channels.iter_mut() {
-        if let Some(pos) = channel.users.iter().position(|u| u == &user.nickname) {
-            channel.users.remove(pos);
-        }
+        self.listener.user_quit(&self.irc, &user.nickname);
     }
 
-    listener.user_quit(irc, &user.nickname);
 }
