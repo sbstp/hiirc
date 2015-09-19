@@ -6,6 +6,7 @@ extern crate loirc;
 #[macro_use]
 mod macros;
 mod core;
+pub mod ext;
 mod listener;
 
 pub use core::{dispatch};
