@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="rustdoc">
+    <meta name="description" content="API documentation for the Rust `ActivityMonitor` struct in crate `loirc`.">
+    <meta name="keywords" content="rust, rustlang, rust-lang, ActivityMonitor">
+
+    <title>loirc::ActivityMonitor - Rust</title>
+
+    <link rel="stylesheet" type="text/css" href="../main.css">
+
+    
+    
+</head>
+<body class="rustdoc">
+    <!--[if lte IE 8]>
+    <div class="warning">
+        This old browser is unsupported and will most likely display funky
+        things.
+    </div>
+    <![endif]-->
+
+    
+
+    <nav class="sidebar">
+        
+        <p class='location'><a href='index.html'>loirc</a></p><script>window.sidebarCurrent = {name: 'ActivityMonitor', ty: 'struct', relpath: ''};</script><script defer src="sidebar-items.js"></script>
+    </nav>
+
+    <nav class="sub">
+        <form class="search-form js-only">
+            <div class="search-container">
+                <input class="search-input" name="search"
+                       autocomplete="off"
+                       placeholder="Click or press ‘S’ to search, ‘?’ for more options…"
+                       type="search">
+            </div>
+        </form>
+    </nav>
+
+    <section id='main' class="content struct">
+<h1 class='fqn'><span class='in-band'>Struct <a href='index.html'>loirc</a>::<wbr><a class='struct' href=''>ActivityMonitor</a></span><span class='out-of-band'><span id='render-detail'>
+            <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
+                [<span class='inner'>&#x2212;</span>]
+            </a>
+        </span><a id='src-667' class='srclink' href='../src/loirc/activity_monitor.rs.html#192-194' title='goto source code'>[src]</a></span></h1>
+<pre class='rust struct'>pub struct ActivityMonitor {
+    // some fields omitted
+}</pre><div class='docblock'><p>This struct monitors a connection&#39;s activity.</p>
+
+<p>It works in a few simple, steps.
+First, it monitors activity via the feed method, saving a timestamp for relevant events.
+If no activity is detected over the given period of time, it will send a ping request to
+the IRC server. If no ping  reply is received, it will trigger a disconnect which may lead
+to reconnection depending on the reconnection settings.</p>
+
+<p>The amount of time to wait, without activity, before sending a ping request, and the amount
+of time to wait for the ping reply can be configured via the <code>MonitorSettings</code> struct.</p>
+</div><h2 id='methods'>Methods</h2><h3 class='impl'><code>impl <a class='struct' href='../loirc/struct.ActivityMonitor.html' title='loirc::ActivityMonitor'>ActivityMonitor</a></code></h3><div class='impl-items'><h4 id='method.new' class='method'><code>fn <a href='#method.new' class='fnname'>new</a>(handle: &amp;<a class='struct' href='../loirc/struct.Writer.html' title='loirc::Writer'>Writer</a>, settings: <a class='struct' href='../loirc/struct.MonitorSettings.html' title='loirc::MonitorSettings'>MonitorSettings</a>) -&gt; <a class='struct' href='../loirc/struct.ActivityMonitor.html' title='loirc::ActivityMonitor'>ActivityMonitor</a></code></h4>
+<div class='docblock'><p>Create a new ActivityMonitor.</p>
+
+<p>The handle to a Writer allows the monitor to notify the connection of disconnects.</p>
+</div><h4 id='method.feed' class='method'><code>fn <a href='#method.feed' class='fnname'>feed</a>(&amp;self, event: &amp;<a class='enum' href='../loirc/enum.Event.html' title='loirc::Event'>Event</a>)</code></h4>
+<div class='docblock'><p>Give an event received from the connection to the monitor.</p>
+
+<p>The monitor will process it accordingly. If an Event::Closed event
+is received, it will shutdown all of its activities.</p>
+</div></div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/ops/trait.Drop.html' title='core::ops::Drop'>Drop</a> for <a class='struct' href='../loirc/struct.ActivityMonitor.html' title='loirc::ActivityMonitor'>ActivityMonitor</a></code></h3><div class='docblock'><p>Drop stops the background thread and clears the monitor&#39;s resources.</p>
+
+<p>If you want the activity monitor to cease its activites, you can simply drop it.
+It will not affect the connection on which the activity monitor operates.</p>
+</div><div class='impl-items'><h4 id='method.drop' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/ops/trait.Drop.html#method.drop' class='fnname'>drop</a>(&amp;mut self)</code></h4>
+</div></section>
+    <section id='search' class="content hidden"></section>
+
+    <section class="footer"></section>
+
+    <aside id="help" class="hidden">
+        <div>
+            <h1 class="hidden">Help</h1>
+
+            <div class="shortcuts">
+                <h2>Keyboard Shortcuts</h2>
+
+                <dl>
+                    <dt>?</dt>
+                    <dd>Show this help dialog</dd>
+                    <dt>S</dt>
+                    <dd>Focus the search field</dd>
+                    <dt>&larrb;</dt>
+                    <dd>Move up in search results</dd>
+                    <dt>&rarrb;</dt>
+                    <dd>Move down in search results</dd>
+                    <dt>&#9166;</dt>
+                    <dd>Go to active search result</dd>
+                </dl>
+            </div>
+
+            <div class="infos">
+                <h2>Search Tricks</h2>
+
+                <p>
+                    Prefix searches with a type followed by a colon (e.g.
+                    <code>fn:</code>) to restrict the search to a given type.
+                </p>
+
+                <p>
+                    Accepted types are: <code>fn</code>, <code>mod</code>,
+                    <code>struct</code>, <code>enum</code>,
+                    <code>trait</code>, <code>type</code>, <code>macro</code>,
+                    and <code>const</code>.
+                </p>
+
+                <p>
+                    Search functions by type signature (e.g.
+                    <code>vec -> usize</code>)
+                </p>
+            </div>
+        </div>
+    </aside>
+
+    
+
+    <script>
+        window.rootPath = "../";
+        window.currentCrate = "loirc";
+        window.playgroundUrl = "";
+    </script>
+    <script src="../jquery.js"></script>
+    <script src="../main.js"></script>
+    
+    <script async src="../search-index.js"></script>
+</body>
+</html>

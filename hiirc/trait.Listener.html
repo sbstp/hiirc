@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="rustdoc">
+    <meta name="description" content="API documentation for the Rust `Listener` trait in crate `hiirc`.">
+    <meta name="keywords" content="rust, rustlang, rust-lang, Listener">
+
+    <title>hiirc::Listener - Rust</title>
+
+    <link rel="stylesheet" type="text/css" href="../main.css">
+
+    
+    
+</head>
+<body class="rustdoc">
+    <!--[if lte IE 8]>
+    <div class="warning">
+        This old browser is unsupported and will most likely display funky
+        things.
+    </div>
+    <![endif]-->
+
+    
+
+    <nav class="sidebar">
+        
+        <p class='location'><a href='index.html'>hiirc</a></p><script>window.sidebarCurrent = {name: 'Listener', ty: 'trait', relpath: ''};</script><script defer src="sidebar-items.js"></script>
+    </nav>
+
+    <nav class="sub">
+        <form class="search-form js-only">
+            <div class="search-container">
+                <input class="search-input" name="search"
+                       autocomplete="off"
+                       placeholder="Click or press ‘S’ to search, ‘?’ for more options…"
+                       type="search">
+            </div>
+        </form>
+    </nav>
+
+    <section id='main' class="content trait">
+<h1 class='fqn'><span class='in-band'>Trait <a href='index.html'>hiirc</a>::<wbr><a class='trait' href=''>Listener</a></span><span class='out-of-band'><span id='render-detail'>
+            <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
+                [<span class='inner'>&#x2212;</span>]
+            </a>
+        </span><a id='src-2345' class='srclink' href='../src/hiirc/listener.rs.html#6-53' title='goto source code'>[src]</a></span></h1>
+<pre class='rust trait'>pub trait Listener {
+    fn <a href='#method.any' class='fnname'>any</a>(&amp;mut self, irc: &amp;<a class='struct' href='../hiirc/struct.Irc.html' title='hiirc::Irc'>Irc</a>, event: &amp;<a class='enum' href='../hiirc/enum.Event.html' title='hiirc::Event'>Event</a>) { ... }
+    fn <a href='#method.welcome' class='fnname'>welcome</a>(&amp;mut self, irc: &amp;<a class='struct' href='../hiirc/struct.Irc.html' title='hiirc::Irc'>Irc</a>) { ... }
+    fn <a href='#method.channel_join' class='fnname'>channel_join</a>(&amp;mut self, irc: &amp;<a class='struct' href='../hiirc/struct.Irc.html' title='hiirc::Irc'>Irc</a>, channel: &amp;<a href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>) { ... }
+    fn <a href='#method.user_join' class='fnname'>user_join</a>(&amp;mut self, irc: &amp;<a class='struct' href='../hiirc/struct.Irc.html' title='hiirc::Irc'>Irc</a>, channel: &amp;<a href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>, nickname: &amp;<a href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>) { ... }
+    fn <a href='#method.user_part' class='fnname'>user_part</a>(&amp;mut self, irc: &amp;<a class='struct' href='../hiirc/struct.Irc.html' title='hiirc::Irc'>Irc</a>, channel: &amp;<a href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>, nickname: &amp;<a href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>) { ... }
+    fn <a href='#method.user_quit' class='fnname'>user_quit</a>(&amp;mut self, irc: &amp;<a class='struct' href='../hiirc/struct.Irc.html' title='hiirc::Irc'>Irc</a>, nickname: &amp;<a href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>) { ... }
+    fn <a href='#method.channel_msg' class='fnname'>channel_msg</a>(&amp;mut self, irc: &amp;<a class='struct' href='../hiirc/struct.Irc.html' title='hiirc::Irc'>Irc</a>, sender: &amp;<a href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>, channel: &amp;<a href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>, message: &amp;<a href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>) { ... }
+    fn <a href='#method.private_msg' class='fnname'>private_msg</a>(&amp;mut self, irc: &amp;<a class='struct' href='../hiirc/struct.Irc.html' title='hiirc::Irc'>Irc</a>, sender: &amp;<a href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>, message: &amp;<a href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>) { ... }
+    fn <a href='#method.topic' class='fnname'>topic</a>(&amp;mut self, irc: &amp;<a class='struct' href='../hiirc/struct.Irc.html' title='hiirc::Irc'>Irc</a>, channel: &amp;<a class='struct' href='../hiirc/struct.Channel.html' title='hiirc::Channel'>Channel</a>, topic: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;&amp;<a href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>&gt;) { ... }
+    fn <a href='#method.topic_change' class='fnname'>topic_change</a>(&amp;mut self, irc: &amp;<a class='struct' href='../hiirc/struct.Irc.html' title='hiirc::Irc'>Irc</a>, channel: &amp;<a class='struct' href='../hiirc/struct.Channel.html' title='hiirc::Channel'>Channel</a>, topic: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;&amp;<a href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>&gt;) { ... }
+}</pre><div class='docblock'><p>Implement this trait to handle events.</p>
+</div>
+            <h2 id='provided-methods'>Provided Methods</h2>
+            <div class='methods'>
+        <h3 id='method.any' class='method stab '><code>fn <a href='#method.any' class='fnname'>any</a>(&amp;mut self, irc: &amp;<a class='struct' href='../hiirc/struct.Irc.html' title='hiirc::Irc'>Irc</a>, event: &amp;<a class='enum' href='../hiirc/enum.Event.html' title='hiirc::Event'>Event</a>)</code></h3><div class='docblock'><p>Any event.</p>
+</div><h3 id='method.welcome' class='method stab '><code>fn <a href='#method.welcome' class='fnname'>welcome</a>(&amp;mut self, irc: &amp;<a class='struct' href='../hiirc/struct.Irc.html' title='hiirc::Irc'>Irc</a>)</code></h3><div class='docblock'><p>When the server sends the welcome packet.</p>
+</div><h3 id='method.channel_join' class='method stab '><code>fn <a href='#method.channel_join' class='fnname'>channel_join</a>(&amp;mut self, irc: &amp;<a class='struct' href='../hiirc/struct.Irc.html' title='hiirc::Irc'>Irc</a>, channel: &amp;<a href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>)</code></h3><div class='docblock'><p>When the client sucessfully joins a channel.</p>
+</div><h3 id='method.user_join' class='method stab '><code>fn <a href='#method.user_join' class='fnname'>user_join</a>(&amp;mut self, irc: &amp;<a class='struct' href='../hiirc/struct.Irc.html' title='hiirc::Irc'>Irc</a>, channel: &amp;<a href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>, nickname: &amp;<a href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>)</code></h3><div class='docblock'><p>When a user joins a channel we are listening on.</p>
+</div><h3 id='method.user_part' class='method stab '><code>fn <a href='#method.user_part' class='fnname'>user_part</a>(&amp;mut self, irc: &amp;<a class='struct' href='../hiirc/struct.Irc.html' title='hiirc::Irc'>Irc</a>, channel: &amp;<a href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>, nickname: &amp;<a href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>)</code></h3><div class='docblock'><p>When a user parts a channel we are listening on.</p>
+</div><h3 id='method.user_quit' class='method stab '><code>fn <a href='#method.user_quit' class='fnname'>user_quit</a>(&amp;mut self, irc: &amp;<a class='struct' href='../hiirc/struct.Irc.html' title='hiirc::Irc'>Irc</a>, nickname: &amp;<a href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>)</code></h3><div class='docblock'><p>When a user quits.</p>
+</div><h3 id='method.channel_msg' class='method stab '><code>fn <a href='#method.channel_msg' class='fnname'>channel_msg</a>(&amp;mut self, irc: &amp;<a class='struct' href='../hiirc/struct.Irc.html' title='hiirc::Irc'>Irc</a>, sender: &amp;<a href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>, channel: &amp;<a href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>, message: &amp;<a href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>)</code></h3><div class='docblock'><p>When a channel message is received.</p>
+</div><h3 id='method.private_msg' class='method stab '><code>fn <a href='#method.private_msg' class='fnname'>private_msg</a>(&amp;mut self, irc: &amp;<a class='struct' href='../hiirc/struct.Irc.html' title='hiirc::Irc'>Irc</a>, sender: &amp;<a href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>, message: &amp;<a href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>)</code></h3><div class='docblock'><p>When a private message is received.</p>
+</div><h3 id='method.topic' class='method stab '><code>fn <a href='#method.topic' class='fnname'>topic</a>(&amp;mut self, irc: &amp;<a class='struct' href='../hiirc/struct.Irc.html' title='hiirc::Irc'>Irc</a>, channel: &amp;<a class='struct' href='../hiirc/struct.Channel.html' title='hiirc::Channel'>Channel</a>, topic: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;&amp;<a href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>&gt;)</code></h3><div class='docblock'><p>Reply to a topic command or when joining a channel.</p>
+
+<p>Note that this event might be called before the channel&#39;s username list is populated.
+If a channel has no topic, this event will not be fired when you join a channel.
+It&#39;s safe to assume that a channel has no topic if this event is not fired when joining.
+If you use the <code>topic</code> method however, you will always get a result.</p>
+</div><h3 id='method.topic_change' class='method stab '><code>fn <a href='#method.topic_change' class='fnname'>topic_change</a>(&amp;mut self, irc: &amp;<a class='struct' href='../hiirc/struct.Irc.html' title='hiirc::Irc'>Irc</a>, channel: &amp;<a class='struct' href='../hiirc/struct.Channel.html' title='hiirc::Channel'>Channel</a>, topic: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;&amp;<a href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>&gt;)</code></h3><div class='docblock'><p>When the topic of is changed by someone.</p>
+</div></div>
+        <h2 id='implementors'>Implementors</h2>
+        <ul class='item-list' id='implementors-list'>
+    </ul><script type="text/javascript" async
+                              src="../implementors/hiirc/trait.Listener.js">
+                      </script></section>
+    <section id='search' class="content hidden"></section>
+
+    <section class="footer"></section>
+
+    <aside id="help" class="hidden">
+        <div>
+            <h1 class="hidden">Help</h1>
+
+            <div class="shortcuts">
+                <h2>Keyboard Shortcuts</h2>
+
+                <dl>
+                    <dt>?</dt>
+                    <dd>Show this help dialog</dd>
+                    <dt>S</dt>
+                    <dd>Focus the search field</dd>
+                    <dt>&larrb;</dt>
+                    <dd>Move up in search results</dd>
+                    <dt>&rarrb;</dt>
+                    <dd>Move down in search results</dd>
+                    <dt>&#9166;</dt>
+                    <dd>Go to active search result</dd>
+                </dl>
+            </div>
+
+            <div class="infos">
+                <h2>Search Tricks</h2>
+
+                <p>
+                    Prefix searches with a type followed by a colon (e.g.
+                    <code>fn:</code>) to restrict the search to a given type.
+                </p>
+
+                <p>
+                    Accepted types are: <code>fn</code>, <code>mod</code>,
+                    <code>struct</code>, <code>enum</code>,
+                    <code>trait</code>, <code>type</code>, <code>macro</code>,
+                    and <code>const</code>.
+                </p>
+
+                <p>
+                    Search functions by type signature (e.g.
+                    <code>vec -> usize</code>)
+                </p>
+            </div>
+        </div>
+    </aside>
+
+    
+
+    <script>
+        window.rootPath = "../";
+        window.currentCrate = "hiirc";
+        window.playgroundUrl = "";
+    </script>
+    <script src="../jquery.js"></script>
+    <script src="../main.js"></script>
+    
+    <script async src="../search-index.js"></script>
+</body>
+</html>

@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["ActivityMonitor","This struct monitors a connection's activity."],["MonitorSettings","These settings tell the monitor how to behave."]]});

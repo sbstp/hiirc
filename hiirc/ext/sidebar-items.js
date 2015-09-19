@@ -1,0 +1,1 @@
+initSidebarItems({"trait":[["NickServ","An extension trait to the Irc struct that adds NickServ capabilities."]]});
