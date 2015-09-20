@@ -16,7 +16,7 @@ mkdir docs
 cd repo
 if cargo doc ; then
     cp -R target/doc/* ../docs
-    if [ ! $(git branch | grep -q gh-pages) ] ; then
+    if [ -z $(git branch -a | grep gh-pages) ] ; then
         git checkout --orphan gh-pages
         echo "Creating new branch"
     else
