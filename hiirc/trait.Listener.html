@@ -45,7 +45,7 @@
             <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                 [<span class='inner'>&#x2212;</span>]
             </a>
-        </span><a id='src-2345' class='srclink' href='../src/hiirc/listener.rs.html#6-53' title='goto source code'>[src]</a></span></h1>
+        </span><a id='src-2345' class='srclink' href='../src/hiirc/listener.rs.html#6-56' title='goto source code'>[src]</a></span></h1>
 <pre class='rust trait'>pub trait Listener {
     fn <a href='#method.any' class='fnname'>any</a>(&amp;mut self, irc: &amp;<a class='struct' href='../hiirc/struct.Irc.html' title='hiirc::Irc'>Irc</a>, event: &amp;<a class='enum' href='../hiirc/enum.Event.html' title='hiirc::Event'>Event</a>) { ... }
     fn <a href='#method.welcome' class='fnname'>welcome</a>(&amp;mut self, irc: &amp;<a class='struct' href='../hiirc/struct.Irc.html' title='hiirc::Irc'>Irc</a>) { ... }
@@ -71,11 +71,14 @@
 </div><h3 id='method.private_msg' class='method stab '><code>fn <a href='#method.private_msg' class='fnname'>private_msg</a>(&amp;mut self, irc: &amp;<a class='struct' href='../hiirc/struct.Irc.html' title='hiirc::Irc'>Irc</a>, sender: &amp;<a href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>, message: &amp;<a href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>)</code></h3><div class='docblock'><p>When a private message is received.</p>
 </div><h3 id='method.topic' class='method stab '><code>fn <a href='#method.topic' class='fnname'>topic</a>(&amp;mut self, irc: &amp;<a class='struct' href='../hiirc/struct.Irc.html' title='hiirc::Irc'>Irc</a>, channel: &amp;<a class='struct' href='../hiirc/struct.Channel.html' title='hiirc::Channel'>Channel</a>, topic: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;&amp;<a href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>&gt;)</code></h3><div class='docblock'><p>Reply to a topic command or when joining a channel.</p>
 
-<p>Note that this event might be called before the channel&#39;s username list is populated.
+<p>Note that this event might be called before the channel&#39;s user list is populated.
 If a channel has no topic, this event will not be fired when you join a channel.
 It&#39;s safe to assume that a channel has no topic if this event is not fired when joining.
-If you use the <code>topic</code> method however, you will always get a result.</p>
+If you use the <code>get_topic</code> method however, you will always get a result.</p>
 </div><h3 id='method.topic_change' class='method stab '><code>fn <a href='#method.topic_change' class='fnname'>topic_change</a>(&amp;mut self, irc: &amp;<a class='struct' href='../hiirc/struct.Irc.html' title='hiirc::Irc'>Irc</a>, channel: &amp;<a class='struct' href='../hiirc/struct.Channel.html' title='hiirc::Channel'>Channel</a>, topic: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;&amp;<a href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>&gt;)</code></h3><div class='docblock'><p>When the topic of is changed by someone.</p>
+
+<p>If you use the <code>set_topic</code> method, you will get a <code>topic_change</code> event instead of a
+<code>topic</code> event.</p>
 </div></div>
         <h2 id='implementors'>Implementors</h2>
         <ul class='item-list' id='implementors-list'>

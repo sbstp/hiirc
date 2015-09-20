@@ -82,12 +82,14 @@
 </div><h4 id='method.quit' class='method'><code>fn <a href='#method.quit' class='fnname'>quit</a>(&amp;self, message: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;&amp;<a href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>&gt;) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>()</a>, <a class='enum' href='../hiirc/enum.Error.html' title='hiirc::Error'>Error</a>&gt;</code></h4>
 <div class='docblock'><p>QUIT command.</p>
 </div><h4 id='method.get_topic' class='method'><code>fn <a href='#method.get_topic' class='fnname'>get_topic</a>(&amp;self, channel: &amp;<a href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>()</a>, <a class='enum' href='../hiirc/enum.Error.html' title='hiirc::Error'>Error</a>&gt;</code></h4>
-<div class='docblock'><p>Retrive the topic of a given channel. The topic event will receive the information.</p>
+<div class='docblock'><p>Retrive the topic of a given channel.</p>
+
+<p>The <code>topic</code> event will receive the information.</p>
 </div><h4 id='method.set_topic' class='method'><code>fn <a href='#method.set_topic' class='fnname'>set_topic</a>(&amp;self, channel: &amp;<a href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>, topic: &amp;<a href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>()</a>, <a class='enum' href='../hiirc/enum.Error.html' title='hiirc::Error'>Error</a>&gt;</code></h4>
 <div class='docblock'><p>Set the topic of a channel.</p>
 
 <p>To remove the topic of a channel, use an empty topic string.
-It will also trigger a topic change event.</p>
+It will also trigger a <code>topic_change</code> event.</p>
 </div></div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><code>impl <a class='trait' href='../hiirc/ext/trait.NickServ.html' title='hiirc::ext::NickServ'>NickServ</a> for <a class='struct' href='../hiirc/struct.Irc.html' title='hiirc::Irc'>Irc</a></code></h3><div class='impl-items'><h4 id='method.identify' class='method'><code>fn <a href='../hiirc/ext/trait.NickServ.html#method.identify' class='fnname'>identify</a>(&amp;self, password: &amp;<a href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>()</a>, <a class='enum' href='../hiirc/enum.Error.html' title='hiirc::Error'>Error</a>&gt;</code></h4>
 </div></section>
     <section id='search' class="content hidden"></section>
