@@ -9,6 +9,25 @@ pub trait Listener {
     #[allow(unused_variables)]
     fn any(&mut self, irc: &Irc, event: &Event) {}
 
+    /// When the connection is closed.
+    ///
+    /// It can happen if you manually close the connection, if you set the `ReconnectionSettings`
+    /// to `DoNotReconnect` or if the maximun number of reconnection attempts is reached.
+    #[allow(unused_variables)]
+    fn close(&mut self, irc: &Irc, reason: &str) {}
+
+    /// When the connection is broken.
+    #[allow(unused_variables)]
+    fn disconnect(&mut self, irc: &Irc) {}
+
+    /// When an attempt to reconnect is made.
+    #[allow(unused_variables)]
+    fn reconnecting(&mut self, irc: &Irc) {}
+
+    /// When the connection is re-established.
+    #[allow(unused_variables)]
+    fn reconnect(&mut self, irc: &Irc) {}
+
     /// When the server sends the welcome packet.
     #[allow(unused_variables)]
     fn welcome(&mut self, irc: &Irc) {}

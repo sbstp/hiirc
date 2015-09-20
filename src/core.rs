@@ -271,13 +271,20 @@ impl<'a> Dispatch<'a> {
         match *event {
             Event::Closed(reason) => {
                 self.irc.status = ConnectionStatus::Closed(reason);
+                self.listener.close(&self.irc, reason);
             }
             Event::Disconnected => {
                 self.irc.status = ConnectionStatus::Disconnected;
                 self.irc.channels.clear();
+                self.listener.disconnect(&self.irc);
             }
             Event::Reconnecting => {
                 self.irc.status = ConnectionStatus::Reconnecting;
+                self.listener.reconnecting(&self.irc);
+            }
+            Event::Reconnected => {
+                self.irc.status = ConnectionStatus::Connected;
+                self.listener.reconnect(&self.irc);
             }
             Event::Message(ref msg) => {
                 match msg.code {
