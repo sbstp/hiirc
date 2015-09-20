@@ -339,7 +339,8 @@ impl<'a> Dispatch<'a> {
 
     fn end_name_reply(&mut self, msg: &Message) {
         let channel_name = some_or_return!(msg.args.get(1));
-        self.listener.channel_join(&self.irc, channel_name);
+        let channel = some_or_return!(self.irc.get_channel_by_name(&channel_name));
+        self.listener.channel_join(&self.irc, channel);
     }
 
     fn topic(&mut self, msg: &Message) {
@@ -383,7 +384,9 @@ impl<'a> Dispatch<'a> {
         let channel_id = channel_name.to_lowercase();
 
         self.irc.add_user(&channel_id, &user.nickname);
-        self.listener.user_join(&self.irc, channel_name, &user.nickname);
+
+        let channel = some_or_return!(self.irc.get_channel_by_id(&channel_id));
+        self.listener.user_join(&self.irc, channel, &user.nickname);
     }
 
     fn part(&mut self, msg: &Message) {
@@ -392,7 +395,9 @@ impl<'a> Dispatch<'a> {
         let channel_id = channel_name.to_lowercase();
 
         self.irc.del_user(&channel_id, &user.nickname);
-        self.listener.user_part(&self.irc, channel_name, &user.nickname)
+
+        let channel = some_or_return!(self.irc.get_channel_by_id(&channel_id));
+        self.listener.user_part(&self.irc, channel, &user.nickname)
     }
 
     fn privmsg(&mut self, msg: &Message) {
@@ -401,7 +406,8 @@ impl<'a> Dispatch<'a> {
         let source = some_or_return!(msg.args.get(0));
 
         if source.starts_with("#") {
-            self.listener.channel_msg(&self.irc, &user.nickname, source, text);
+            let channel = some_or_return!(self.irc.get_channel_by_name(&source));
+            self.listener.channel_msg(&self.irc, channel, &user.nickname, text);
         } else {
             self.listener.private_msg(&self.irc, &user.nickname, text);
         }

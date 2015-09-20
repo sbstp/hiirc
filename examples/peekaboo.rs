@@ -31,8 +31,8 @@ impl<'a> Listener for Peekaboo<'a> {
     }
 
     /// When the channel is joined, say "peekaboo" and quit.
-    fn channel_join(&mut self, irc: &Irc, channel: &str) {
-        irc.privmsg(channel, "peekaboo");
+    fn channel_join(&mut self, irc: &Irc, channel: &Channel) {
+        irc.privmsg(&channel.name, "peekaboo");
         irc.quit(Some("peekaboo"));
     }
 

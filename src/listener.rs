@@ -34,15 +34,15 @@ pub trait Listener {
 
     /// When the client sucessfully joins a channel.
     #[allow(unused_variables)]
-    fn channel_join(&mut self, irc: &Irc, channel: &str) {}
+    fn channel_join(&mut self, irc: &Irc, channel: &Channel) {}
 
     /// When a user joins a channel we are listening on.
     #[allow(unused_variables)]
-    fn user_join(&mut self, irc: &Irc, channel: &str, nickname :&str) {}
+    fn user_join(&mut self, irc: &Irc, channel: &Channel, nickname :&str) {}
 
     /// When a user parts a channel we are listening on.
     #[allow(unused_variables)]
-    fn user_part(&mut self, irc: &Irc, channel: &str, nickname :&str) {}
+    fn user_part(&mut self, irc: &Irc, channel: &Channel, nickname :&str) {}
 
     /// When a user quits.
     #[allow(unused_variables)]
@@ -50,7 +50,7 @@ pub trait Listener {
 
     /// When a channel message is received.
     #[allow(unused_variables)]
-    fn channel_msg(&mut self, irc: &Irc, sender: &str, channel: &str, message: &str) {}
+    fn channel_msg(&mut self, irc: &Irc, channel: &Channel, sender: &str, message: &str) {}
 
     /// When a private message is received.
     #[allow(unused_variables)]
