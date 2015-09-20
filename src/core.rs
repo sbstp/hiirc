@@ -213,7 +213,9 @@ impl Irc {
         }
     }
 
-    /// Retrive the topic of a given channel. The topic event will receive the information.
+    /// Retrive the topic of a given channel.
+    ///
+    /// The `topic` event will receive the information.
     pub fn get_topic(&self, channel: &str) -> Result<(), Error> {
         self.raw(format!("TOPIC {}", channel))
     }
@@ -221,7 +223,7 @@ impl Irc {
     /// Set the topic of a channel.
     ///
     /// To remove the topic of a channel, use an empty topic string.
-    /// It will also trigger a topic change event.
+    /// It will also trigger a `topic_change` event.
     pub fn set_topic(&self, channel: &str, topic: &str) -> Result<(), Error> {
         self.raw(format!("TOPIC {} :{}", channel, topic))
     }

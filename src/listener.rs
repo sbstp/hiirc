@@ -37,16 +37,18 @@ pub trait Listener {
     #[allow(unused_variables)]
     fn private_msg(&mut self, irc: &Irc, sender: &str, message: &str) {}
 
-    /// Reply to a topic command or when joining a channel.
+    /// Reply to a `get_topic` command and when joining a channel.
     ///
-    /// Note that this event might be called before the channel's username list is populated.
+    /// Note that this event might be called before the channel's user list is populated.
     /// If a channel has no topic, this event will not be fired when you join a channel.
     /// It's safe to assume that a channel has no topic if this event is not fired when joining.
-    /// If you use the `topic` method however, you will always get a result.
     #[allow(unused_variables)]
     fn topic(&mut self, irc: &Irc, channel: &Channel, topic: Option<&str>) {}
 
     /// When the topic of is changed by someone.
+    ///
+    /// If you use the `set_topic` method, you will get a `topic_change` event instead of a
+    /// `topic` event.
     #[allow(unused_variables)]
     fn topic_change(&mut self, irc: &Irc, channel: &Channel, topic: Option<&str>) {}
 
