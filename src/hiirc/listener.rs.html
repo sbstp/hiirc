@@ -95,7 +95,6 @@
 <span id="53">53</span>
 <span id="54">54</span>
 <span id="55">55</span>
-<span id="56">56</span>
 </pre><pre class='rust '>
 <span class='kw'>use</span> <span class='ident'>loirc</span>::<span class='ident'>Event</span>;
 
@@ -136,12 +135,11 @@
     <span class='attribute'>#[<span class='ident'>allow</span>(<span class='ident'>unused_variables</span>)]</span>
     <span class='kw'>fn</span> <span class='ident'>private_msg</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>irc</span>: <span class='kw-2'>&amp;</span><span class='ident'>Irc</span>, <span class='ident'>sender</span>: <span class='kw-2'>&amp;</span><span class='ident'>str</span>, <span class='ident'>message</span>: <span class='kw-2'>&amp;</span><span class='ident'>str</span>) {}
 
-    <span class='doccomment'>/// Reply to a topic command or when joining a channel.</span>
+    <span class='doccomment'>/// Reply to a `get_topic` command and when joining a channel.</span>
     <span class='doccomment'>///</span>
     <span class='doccomment'>/// Note that this event might be called before the channel&#39;s user list is populated.</span>
     <span class='doccomment'>/// If a channel has no topic, this event will not be fired when you join a channel.</span>
     <span class='doccomment'>/// It&#39;s safe to assume that a channel has no topic if this event is not fired when joining.</span>
-    <span class='doccomment'>/// If you use the `get_topic` method however, you will always get a result.</span>
     <span class='attribute'>#[<span class='ident'>allow</span>(<span class='ident'>unused_variables</span>)]</span>
     <span class='kw'>fn</span> <span class='ident'>topic</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>irc</span>: <span class='kw-2'>&amp;</span><span class='ident'>Irc</span>, <span class='ident'>channel</span>: <span class='kw-2'>&amp;</span><span class='ident'>Channel</span>, <span class='ident'>topic</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='ident'>str</span><span class='op'>&gt;</span>) {}
 
