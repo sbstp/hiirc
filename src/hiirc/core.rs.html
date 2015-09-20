@@ -455,6 +455,13 @@
 <span id="413">413</span>
 <span id="414">414</span>
 <span id="415">415</span>
+<span id="416">416</span>
+<span id="417">417</span>
+<span id="418">418</span>
+<span id="419">419</span>
+<span id="420">420</span>
+<span id="421">421</span>
+<span id="422">422</span>
 </pre><pre class='rust '>
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>collections</span>::<span class='ident'>HashMap</span>;
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>io</span>;
@@ -729,13 +736,20 @@
         <span class='kw'>match</span> <span class='op'>*</span><span class='ident'>event</span> {
             <span class='ident'>Event</span>::<span class='ident'>Closed</span>(<span class='ident'>reason</span>) <span class='op'>=&gt;</span> {
                 <span class='self'>self</span>.<span class='ident'>irc</span>.<span class='ident'>status</span> <span class='op'>=</span> <span class='ident'>ConnectionStatus</span>::<span class='ident'>Closed</span>(<span class='ident'>reason</span>);
+                <span class='self'>self</span>.<span class='ident'>listener</span>.<span class='ident'>close</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>irc</span>, <span class='ident'>reason</span>);
             }
             <span class='ident'>Event</span>::<span class='ident'>Disconnected</span> <span class='op'>=&gt;</span> {
                 <span class='self'>self</span>.<span class='ident'>irc</span>.<span class='ident'>status</span> <span class='op'>=</span> <span class='ident'>ConnectionStatus</span>::<span class='ident'>Disconnected</span>;
                 <span class='self'>self</span>.<span class='ident'>irc</span>.<span class='ident'>channels</span>.<span class='ident'>clear</span>();
+                <span class='self'>self</span>.<span class='ident'>listener</span>.<span class='ident'>disconnect</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>irc</span>);
             }
             <span class='ident'>Event</span>::<span class='ident'>Reconnecting</span> <span class='op'>=&gt;</span> {
                 <span class='self'>self</span>.<span class='ident'>irc</span>.<span class='ident'>status</span> <span class='op'>=</span> <span class='ident'>ConnectionStatus</span>::<span class='ident'>Reconnecting</span>;
+                <span class='self'>self</span>.<span class='ident'>listener</span>.<span class='ident'>reconnecting</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>irc</span>);
+            }
+            <span class='ident'>Event</span>::<span class='ident'>Reconnected</span> <span class='op'>=&gt;</span> {
+                <span class='self'>self</span>.<span class='ident'>irc</span>.<span class='ident'>status</span> <span class='op'>=</span> <span class='ident'>ConnectionStatus</span>::<span class='ident'>Connected</span>;
+                <span class='self'>self</span>.<span class='ident'>listener</span>.<span class='ident'>reconnect</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>irc</span>);
             }
             <span class='ident'>Event</span>::<span class='ident'>Message</span>(<span class='kw-2'>ref</span> <span class='ident'>msg</span>) <span class='op'>=&gt;</span> {
                 <span class='kw'>match</span> <span class='ident'>msg</span>.<span class='ident'>code</span> {

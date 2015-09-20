@@ -45,9 +45,13 @@
             <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                 [<span class='inner'>&#x2212;</span>]
             </a>
-        </span><a id='src-2345' class='srclink' href='../src/hiirc/listener.rs.html#6-55' title='goto source code'>[src]</a></span></h1>
+        </span><a id='src-2383' class='srclink' href='../src/hiirc/listener.rs.html#6-74' title='goto source code'>[src]</a></span></h1>
 <pre class='rust trait'>pub trait Listener {
     fn <a href='#method.any' class='fnname'>any</a>(&amp;mut self, irc: &amp;<a class='struct' href='../hiirc/struct.Irc.html' title='hiirc::Irc'>Irc</a>, event: &amp;<a class='enum' href='../hiirc/enum.Event.html' title='hiirc::Event'>Event</a>) { ... }
+    fn <a href='#method.close' class='fnname'>close</a>(&amp;mut self, irc: &amp;<a class='struct' href='../hiirc/struct.Irc.html' title='hiirc::Irc'>Irc</a>, reason: &amp;<a href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>) { ... }
+    fn <a href='#method.disconnect' class='fnname'>disconnect</a>(&amp;mut self, irc: &amp;<a class='struct' href='../hiirc/struct.Irc.html' title='hiirc::Irc'>Irc</a>) { ... }
+    fn <a href='#method.reconnecting' class='fnname'>reconnecting</a>(&amp;mut self, irc: &amp;<a class='struct' href='../hiirc/struct.Irc.html' title='hiirc::Irc'>Irc</a>) { ... }
+    fn <a href='#method.reconnect' class='fnname'>reconnect</a>(&amp;mut self, irc: &amp;<a class='struct' href='../hiirc/struct.Irc.html' title='hiirc::Irc'>Irc</a>) { ... }
     fn <a href='#method.welcome' class='fnname'>welcome</a>(&amp;mut self, irc: &amp;<a class='struct' href='../hiirc/struct.Irc.html' title='hiirc::Irc'>Irc</a>) { ... }
     fn <a href='#method.channel_join' class='fnname'>channel_join</a>(&amp;mut self, irc: &amp;<a class='struct' href='../hiirc/struct.Irc.html' title='hiirc::Irc'>Irc</a>, channel: &amp;<a href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>) { ... }
     fn <a href='#method.user_join' class='fnname'>user_join</a>(&amp;mut self, irc: &amp;<a class='struct' href='../hiirc/struct.Irc.html' title='hiirc::Irc'>Irc</a>, channel: &amp;<a href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>, nickname: &amp;<a href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>) { ... }
@@ -62,6 +66,13 @@
             <h2 id='provided-methods'>Provided Methods</h2>
             <div class='methods'>
         <h3 id='method.any' class='method stab '><code>fn <a href='#method.any' class='fnname'>any</a>(&amp;mut self, irc: &amp;<a class='struct' href='../hiirc/struct.Irc.html' title='hiirc::Irc'>Irc</a>, event: &amp;<a class='enum' href='../hiirc/enum.Event.html' title='hiirc::Event'>Event</a>)</code></h3><div class='docblock'><p>Any event.</p>
+</div><h3 id='method.close' class='method stab '><code>fn <a href='#method.close' class='fnname'>close</a>(&amp;mut self, irc: &amp;<a class='struct' href='../hiirc/struct.Irc.html' title='hiirc::Irc'>Irc</a>, reason: &amp;<a href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>)</code></h3><div class='docblock'><p>When the connection is closed.</p>
+
+<p>It can happen if you manually close the connection, if you set the <code>ReconnectionSettings</code>
+to <code>DoNotReconnect</code> or if the maximun number of reconnection attempts is reached.</p>
+</div><h3 id='method.disconnect' class='method stab '><code>fn <a href='#method.disconnect' class='fnname'>disconnect</a>(&amp;mut self, irc: &amp;<a class='struct' href='../hiirc/struct.Irc.html' title='hiirc::Irc'>Irc</a>)</code></h3><div class='docblock'><p>When the connection is broken.</p>
+</div><h3 id='method.reconnecting' class='method stab '><code>fn <a href='#method.reconnecting' class='fnname'>reconnecting</a>(&amp;mut self, irc: &amp;<a class='struct' href='../hiirc/struct.Irc.html' title='hiirc::Irc'>Irc</a>)</code></h3><div class='docblock'><p>When an attempt to reconnect is made.</p>
+</div><h3 id='method.reconnect' class='method stab '><code>fn <a href='#method.reconnect' class='fnname'>reconnect</a>(&amp;mut self, irc: &amp;<a class='struct' href='../hiirc/struct.Irc.html' title='hiirc::Irc'>Irc</a>)</code></h3><div class='docblock'><p>When the connection is re-established.</p>
 </div><h3 id='method.welcome' class='method stab '><code>fn <a href='#method.welcome' class='fnname'>welcome</a>(&amp;mut self, irc: &amp;<a class='struct' href='../hiirc/struct.Irc.html' title='hiirc::Irc'>Irc</a>)</code></h3><div class='docblock'><p>When the server sends the welcome packet.</p>
 </div><h3 id='method.channel_join' class='method stab '><code>fn <a href='#method.channel_join' class='fnname'>channel_join</a>(&amp;mut self, irc: &amp;<a class='struct' href='../hiirc/struct.Irc.html' title='hiirc::Irc'>Irc</a>, channel: &amp;<a href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>)</code></h3><div class='docblock'><p>When the client sucessfully joins a channel.</p>
 </div><h3 id='method.user_join' class='method stab '><code>fn <a href='#method.user_join' class='fnname'>user_join</a>(&amp;mut self, irc: &amp;<a class='struct' href='../hiirc/struct.Irc.html' title='hiirc::Irc'>Irc</a>, channel: &amp;<a href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>, nickname: &amp;<a href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>)</code></h3><div class='docblock'><p>When a user joins a channel we are listening on.</p>
