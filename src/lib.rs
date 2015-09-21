@@ -15,6 +15,6 @@ pub mod ext;
 mod listener;
 
 pub use core::{dispatch};
-pub use core::{Channel, ConnectionStatus, Error, Irc, Settings};
+pub use core::{Channel, ConnectionStatus, Error, Irc, Settings, ChannelUser, ChannelUserStatus};
 pub use listener::Listener;
 pub use loirc::{Duration, Event, MonitorSettings, ReconnectionSettings};

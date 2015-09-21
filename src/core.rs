@@ -5,17 +5,63 @@ use listener::Listener;
 use loirc::{self, connect};
 use loirc::{ActivityMonitor, Code, Event, Message, MonitorSettings, Prefix, ReconnectionSettings, Writer};
 
+/// Represents the status of a user inside of a channel.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum ChannelUserStatus {
+    /// User has special status.
+    Normal,
+    /// User has voice status.
+    Voice,
+    /// User has operator status.
+    Operator,
+}
+
+/// Represents a user inside of a channel.
+#[derive(Debug)]
+pub struct ChannelUser {
+    /// Nickname of the user.
+    pub name: String,
+    /// Status of the user inside the channel.
+    pub status: ChannelUserStatus,
+}
+
+impl ChannelUser {
+
+    fn from_raw(raw: &str) -> ChannelUser {
+        let status = match raw.chars().next() {
+            Some('@') => ChannelUserStatus::Operator,
+            Some('+') => ChannelUserStatus::Voice,
+            _ => ChannelUserStatus::Normal,
+        };
+        ChannelUser {
+            name: (if status == ChannelUserStatus::Normal { raw } else { &raw[1..] }).to_owned(),
+            status: status,
+        }
+    }
+}
+
 /// Represents a channel.
 #[derive(Debug)]
 pub struct Channel {
     /// Name of the channel.
     pub name: String,
     /// List of users by nickname.
-    pub users: Vec<String>,
+    pub users: Vec<ChannelUser>,
     /// Topic of the channel.
     pub topic: Option<String>,
 }
 
+impl Channel {
+
+    /// Get a user by nickname from this channel.
+    pub fn get_user(&self, nickname: &str) -> Option<&ChannelUser> {
+        match self.users.iter().position(|u| u.name == nickname) {
+            Some(idx) => Some(&self.users[idx]),
+            None => None,
+        }
+    }
+
+}
 /// Status of the connection.
 #[derive(Debug)]
 pub enum ConnectionStatus {
@@ -120,7 +166,7 @@ impl Irc {
         }
     }
 
-    fn set_channel_topic(&mut self, channel_id: &str, topic: &str) {
+    fn channel_set_topic(&mut self, channel_id: &str, topic: &str) {
         let channel = some_or_return!(self.channels.get_mut(channel_id));
         channel.topic = if topic.len() == 0 {
             None
@@ -129,14 +175,14 @@ impl Irc {
         };
     }
 
-    fn add_user(&mut self, channel_id: &str, nickname: &str) {
+    fn channel_add_user(&mut self, channel_id: &str, raw: &str) {
         let channel = some_or_return!(self.channels.get_mut(channel_id));
-        channel.users.push(nickname.to_owned());
+        channel.users.push(ChannelUser::from_raw(raw));
     }
 
-    fn del_user(&mut self, channel_id: &str, nickname: &str) {
+    fn channel_del_user(&mut self, channel_id: &str, nickname: &str) {
         let channel = some_or_return!(self.channels.get_mut(channel_id));
-        if let Some(pos) = channel.users.iter().position(|u| u == nickname) {
+        if let Some(pos) = channel.users.iter().position(|u| u.name == nickname) {
             channel.users.remove(pos);
         }
     }
@@ -331,9 +377,8 @@ impl<'a> Dispatch<'a> {
         let user_list = some_or_return!(msg.suffix.as_ref());
 
         self.irc.ensure_channel_exists(channel_name, &channel_id);
-        let channel = some_or_return!(self.irc.channels.get_mut(&channel_id));
-        for nick in user_list.split(" ") {
-            channel.users.push(nick.to_owned());
+        for raw in user_list.split(" ") {
+            self.irc.channel_add_user(&channel_id, raw);
         }
     }
 
@@ -349,7 +394,7 @@ impl<'a> Dispatch<'a> {
         let channel_id = channel_name.to_lowercase();
 
         self.irc.ensure_channel_exists(&channel_id, channel_name);
-        self.irc.set_channel_topic(&channel_id, topic);
+        self.irc.channel_set_topic(&channel_id, topic);
 
         let channel = some_or_return!(self.irc.get_channel_by_id(&channel_id));
         self.listener.topic_change(&self.irc, channel, channel.topic.as_ref().map(|t| &t[..]));
@@ -361,7 +406,7 @@ impl<'a> Dispatch<'a> {
         let channel_id = channel_name.to_lowercase();
 
         self.irc.ensure_channel_exists(&channel_id, channel_name);
-        self.irc.set_channel_topic(&channel_id, topic);
+        self.irc.channel_set_topic(&channel_id, topic);
 
         let channel = some_or_return!(self.irc.get_channel_by_id(&channel_id));
         self.listener.topic(&self.irc, channel, channel.topic.as_ref().map(|t| &t[..]));
@@ -372,44 +417,47 @@ impl<'a> Dispatch<'a> {
         let channel_id = channel_name.to_lowercase();
 
         self.irc.ensure_channel_exists(channel_name, &channel_id);
-        self.irc.set_channel_topic(&channel_id, "");
+        self.irc.channel_set_topic(&channel_id, "");
 
         let channel = some_or_return!(self.irc.get_channel_by_id(&channel_id));
         self.listener.topic(&self.irc, channel, channel.topic.as_ref().map(|t| &t[..]));
     }
 
     fn join(&mut self, msg: &Message) {
-        let user = user_or_return!(msg.prefix);
+        let prefix = user_or_return!(msg.prefix);
         let channel_name = some_or_return!(msg.args.get(0));
         let channel_id = channel_name.to_lowercase();
 
-        self.irc.add_user(&channel_id, &user.nickname);
+        self.irc.channel_add_user(&channel_id, &prefix.nickname);
 
         let channel = some_or_return!(self.irc.get_channel_by_id(&channel_id));
-        self.listener.user_join(&self.irc, channel, &user.nickname);
+        let user = some_or_return!(channel.get_user(&prefix.nickname));
+        self.listener.user_join(&self.irc, channel, user);
     }
 
     fn part(&mut self, msg: &Message) {
-        let user = user_or_return!(msg.prefix);
+        let prefix = user_or_return!(msg.prefix);
         let channel_name = some_or_return!(msg.args.get(0));
         let channel_id = channel_name.to_lowercase();
 
-        self.irc.del_user(&channel_id, &user.nickname);
+        self.irc.channel_del_user(&channel_id, &prefix.nickname);
 
         let channel = some_or_return!(self.irc.get_channel_by_id(&channel_id));
-        self.listener.user_part(&self.irc, channel, &user.nickname)
+        let user = some_or_return!(channel.get_user(&prefix.nickname));
+        self.listener.user_part(&self.irc, channel, user);
     }
 
     fn privmsg(&mut self, msg: &Message) {
-        let user = user_or_return!(msg.prefix);
+        let prefix = user_or_return!(msg.prefix);
         let text = some_or_return!(msg.suffix.as_ref());
         let source = some_or_return!(msg.args.get(0));
 
         if source.starts_with("#") {
             let channel = some_or_return!(self.irc.get_channel_by_name(&source));
-            self.listener.channel_msg(&self.irc, channel, &user.nickname, text);
+            let user = some_or_return!(channel.get_user(&prefix.nickname));
+            self.listener.channel_msg(&self.irc, channel, user, text);
         } else {
-            self.listener.private_msg(&self.irc, &user.nickname, text);
+            self.listener.private_msg(&self.irc, &prefix.nickname, text);
         }
     }
 
@@ -417,7 +465,7 @@ impl<'a> Dispatch<'a> {
         let user = user_or_return!(msg.prefix);
 
         for (_, channel) in self.irc.channels.iter_mut() {
-            if let Some(pos) = channel.users.iter().position(|u| u == &user.nickname) {
+            if let Some(pos) = channel.users.iter().position(|u| &u.name == &user.nickname) {
                 channel.users.remove(pos);
             }
         }
@@ -425,4 +473,25 @@ impl<'a> Dispatch<'a> {
         self.listener.user_quit(&self.irc, &user.nickname);
     }
 
+}
+
+#[test]
+fn test_user_from_raw_norm() {
+    let user = ChannelUser::from_raw("TEST");
+    assert_eq!(&user.name, "TEST");
+    assert_eq!(user.status, ChannelUserStatus::Normal);
+}
+
+#[test]
+fn test_user_from_raw_voice() {
+    let user = ChannelUser::from_raw("+TEst");
+    assert_eq!(&user.name, "TEst");
+    assert_eq!(user.status, ChannelUserStatus::Voice);
+}
+
+#[test]
+fn test_user_from_raw_op() {
+    let user = ChannelUser::from_raw("@test");
+    assert_eq!(&user.name, "test");
+    assert_eq!(user.status, ChannelUserStatus::Operator);
 }

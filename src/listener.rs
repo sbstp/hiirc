@@ -1,6 +1,6 @@
 use loirc::Event;
 
-use {Channel, Irc};
+use {Channel, ChannelUser, Irc};
 
 /// Implement this trait to handle events.
 pub trait Listener {
@@ -38,11 +38,11 @@ pub trait Listener {
 
     /// When a user joins a channel we are listening on.
     #[allow(unused_variables)]
-    fn user_join(&mut self, irc: &Irc, channel: &Channel, nickname :&str) {}
+    fn user_join(&mut self, irc: &Irc, channel: &Channel, user :&ChannelUser) {}
 
     /// When a user parts a channel we are listening on.
     #[allow(unused_variables)]
-    fn user_part(&mut self, irc: &Irc, channel: &Channel, nickname :&str) {}
+    fn user_part(&mut self, irc: &Irc, channel: &Channel, user :&ChannelUser) {}
 
     /// When a user quits.
     #[allow(unused_variables)]
@@ -50,7 +50,7 @@ pub trait Listener {
 
     /// When a channel message is received.
     #[allow(unused_variables)]
-    fn channel_msg(&mut self, irc: &Irc, channel: &Channel, sender: &str, message: &str) {}
+    fn channel_msg(&mut self, irc: &Irc, channel: &Channel, sender: &ChannelUser, message: &str) {}
 
     /// When a private message is received.
     #[allow(unused_variables)]
