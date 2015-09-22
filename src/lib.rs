@@ -17,4 +17,6 @@ mod listener;
 pub use core::{dispatch};
 pub use core::{Channel, ConnectionStatus, Error, Irc, Settings, ChannelUser, ChannelUserStatus};
 pub use listener::Listener;
-pub use loirc::{Duration, Event, MonitorSettings, ReconnectionSettings};
+pub use loirc::Error as LoircError;
+pub use loirc::{Code, Duration, Event, Message, MonitorSettings, ParseError, Prefix, PrefixUser,
+                ReconnectionSettings};
