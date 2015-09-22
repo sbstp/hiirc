@@ -419,7 +419,7 @@
                 <span class='prelude-val'>Some</span>(<span class='ident'>atpos</span>) <span class='op'>=&gt;</span> {
                     <span class='kw'>let</span> <span class='ident'>user</span> <span class='op'>=</span> <span class='kw-2'>&amp;</span><span class='ident'>rest</span>[..<span class='ident'>atpos</span>];
                     <span class='kw'>let</span> <span class='ident'>host</span> <span class='op'>=</span> <span class='kw-2'>&amp;</span><span class='ident'>rest</span>[<span class='ident'>atpos</span> <span class='op'>+</span> <span class='number'>1</span>..];
-                    <span class='kw'>return</span> <span class='prelude-val'>Some</span>(<span class='ident'>Prefix</span>::<span class='ident'>User</span>(<span class='ident'>User</span>::<span class='ident'>new</span>(<span class='ident'>nick</span>, <span class='ident'>user</span>, <span class='ident'>host</span>)));
+                    <span class='kw'>return</span> <span class='prelude-val'>Some</span>(<span class='ident'>Prefix</span>::<span class='ident'>User</span>(<span class='ident'>PrefixUser</span>::<span class='ident'>new</span>(<span class='ident'>nick</span>, <span class='ident'>user</span>, <span class='ident'>host</span>)));
                 }
             }
         }
@@ -430,14 +430,14 @@
 <span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Clone</span>, <span class='ident'>Debug</span>, <span class='ident'>Eq</span>, <span class='ident'>PartialEq</span>)]</span>
 <span class='kw'>pub</span> <span class='kw'>enum</span> <span class='ident'>Prefix</span> {
     <span class='doccomment'>/// Prefix is a user.</span>
-    <span class='ident'>User</span>(<span class='ident'>User</span>),
+    <span class='ident'>User</span>(<span class='ident'>PrefixUser</span>),
     <span class='doccomment'>/// Prefix is a server.</span>
     <span class='ident'>Server</span>(<span class='ident'>String</span>),
 }
 
 <span class='doccomment'>/// User prefix representation.</span>
 <span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Clone</span>, <span class='ident'>Debug</span>, <span class='ident'>Eq</span>, <span class='ident'>PartialEq</span>)]</span>
-<span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>User</span> {
+<span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>PrefixUser</span> {
     <span class='doccomment'>/// Nickname</span>
     <span class='kw'>pub</span> <span class='ident'>nickname</span>: <span class='ident'>String</span>,
     <span class='doccomment'>/// Username</span>
@@ -446,10 +446,10 @@
     <span class='kw'>pub</span> <span class='ident'>hostname</span>: <span class='ident'>String</span>,
 }
 
-<span class='kw'>impl</span> <span class='ident'>User</span> {
+<span class='kw'>impl</span> <span class='ident'>PrefixUser</span> {
 
-    <span class='kw'>fn</span> <span class='ident'>new</span>(<span class='ident'>nick</span>: <span class='kw-2'>&amp;</span><span class='ident'>str</span>, <span class='ident'>user</span>: <span class='kw-2'>&amp;</span><span class='ident'>str</span>, <span class='ident'>host</span>: <span class='kw-2'>&amp;</span><span class='ident'>str</span>) <span class='op'>-&gt;</span> <span class='ident'>User</span> {
-        <span class='ident'>User</span> {
+    <span class='kw'>fn</span> <span class='ident'>new</span>(<span class='ident'>nick</span>: <span class='kw-2'>&amp;</span><span class='ident'>str</span>, <span class='ident'>user</span>: <span class='kw-2'>&amp;</span><span class='ident'>str</span>, <span class='ident'>host</span>: <span class='kw-2'>&amp;</span><span class='ident'>str</span>) <span class='op'>-&gt;</span> <span class='ident'>PrefixUser</span> {
+        <span class='ident'>PrefixUser</span> {
             <span class='ident'>nickname</span>: <span class='ident'>nick</span>.<span class='ident'>into</span>(),
             <span class='ident'>username</span>: <span class='ident'>user</span>.<span class='ident'>into</span>(),
             <span class='ident'>hostname</span>: <span class='ident'>host</span>.<span class='ident'>into</span>(),
@@ -555,7 +555,7 @@
     <span class='kw'>let</span> <span class='ident'>res</span> <span class='op'>=</span> <span class='ident'>Message</span>::<span class='ident'>parse</span>(<span class='string'>&quot;:bob!bob@bob.com COMMAND :suffix is pretty cool yo&quot;</span>);
     <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>res</span>.<span class='ident'>is_ok</span>());
     <span class='kw'>let</span> <span class='ident'>msg</span> <span class='op'>=</span> <span class='ident'>res</span>.<span class='ident'>ok</span>().<span class='ident'>unwrap</span>();
-    <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>msg</span>.<span class='ident'>prefix</span>, <span class='prelude-val'>Some</span>(<span class='ident'>Prefix</span>::<span class='ident'>User</span>(<span class='ident'>User</span>::<span class='ident'>new</span>(<span class='string'>&quot;bob&quot;</span>, <span class='string'>&quot;bob&quot;</span>, <span class='string'>&quot;bob.com&quot;</span>))));
+    <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>msg</span>.<span class='ident'>prefix</span>, <span class='prelude-val'>Some</span>(<span class='ident'>Prefix</span>::<span class='ident'>User</span>(<span class='ident'>PrefixUser</span>::<span class='ident'>new</span>(<span class='string'>&quot;bob&quot;</span>, <span class='string'>&quot;bob&quot;</span>, <span class='string'>&quot;bob.com&quot;</span>))));
 }
 </pre>
 </section>
