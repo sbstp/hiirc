@@ -117,7 +117,7 @@
 </pre><pre class='rust '>
 <span class='kw'>use</span> <span class='ident'>loirc</span>::<span class='ident'>Event</span>;
 
-<span class='kw'>use</span> {<span class='ident'>Channel</span>, <span class='ident'>Irc</span>};
+<span class='kw'>use</span> {<span class='ident'>Channel</span>, <span class='ident'>ChannelUser</span>, <span class='ident'>Irc</span>};
 
 <span class='doccomment'>/// Implement this trait to handle events.</span>
 <span class='kw'>pub</span> <span class='kw'>trait</span> <span class='ident'>Listener</span> {
@@ -155,11 +155,11 @@
 
     <span class='doccomment'>/// When a user joins a channel we are listening on.</span>
     <span class='attribute'>#[<span class='ident'>allow</span>(<span class='ident'>unused_variables</span>)]</span>
-    <span class='kw'>fn</span> <span class='ident'>user_join</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>irc</span>: <span class='kw-2'>&amp;</span><span class='ident'>Irc</span>, <span class='ident'>channel</span>: <span class='kw-2'>&amp;</span><span class='ident'>Channel</span>, <span class='ident'>nickname</span> :<span class='kw-2'>&amp;</span><span class='ident'>str</span>) {}
+    <span class='kw'>fn</span> <span class='ident'>user_join</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>irc</span>: <span class='kw-2'>&amp;</span><span class='ident'>Irc</span>, <span class='ident'>channel</span>: <span class='kw-2'>&amp;</span><span class='ident'>Channel</span>, <span class='ident'>user</span> :<span class='kw-2'>&amp;</span><span class='ident'>ChannelUser</span>) {}
 
     <span class='doccomment'>/// When a user parts a channel we are listening on.</span>
     <span class='attribute'>#[<span class='ident'>allow</span>(<span class='ident'>unused_variables</span>)]</span>
-    <span class='kw'>fn</span> <span class='ident'>user_part</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>irc</span>: <span class='kw-2'>&amp;</span><span class='ident'>Irc</span>, <span class='ident'>channel</span>: <span class='kw-2'>&amp;</span><span class='ident'>Channel</span>, <span class='ident'>nickname</span> :<span class='kw-2'>&amp;</span><span class='ident'>str</span>) {}
+    <span class='kw'>fn</span> <span class='ident'>user_part</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>irc</span>: <span class='kw-2'>&amp;</span><span class='ident'>Irc</span>, <span class='ident'>channel</span>: <span class='kw-2'>&amp;</span><span class='ident'>Channel</span>, <span class='ident'>user</span> :<span class='kw-2'>&amp;</span><span class='ident'>ChannelUser</span>) {}
 
     <span class='doccomment'>/// When a user quits.</span>
     <span class='attribute'>#[<span class='ident'>allow</span>(<span class='ident'>unused_variables</span>)]</span>
@@ -167,7 +167,7 @@
 
     <span class='doccomment'>/// When a channel message is received.</span>
     <span class='attribute'>#[<span class='ident'>allow</span>(<span class='ident'>unused_variables</span>)]</span>
-    <span class='kw'>fn</span> <span class='ident'>channel_msg</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>irc</span>: <span class='kw-2'>&amp;</span><span class='ident'>Irc</span>, <span class='ident'>channel</span>: <span class='kw-2'>&amp;</span><span class='ident'>Channel</span>, <span class='ident'>sender</span>: <span class='kw-2'>&amp;</span><span class='ident'>str</span>, <span class='ident'>message</span>: <span class='kw-2'>&amp;</span><span class='ident'>str</span>) {}
+    <span class='kw'>fn</span> <span class='ident'>channel_msg</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>irc</span>: <span class='kw-2'>&amp;</span><span class='ident'>Irc</span>, <span class='ident'>channel</span>: <span class='kw-2'>&amp;</span><span class='ident'>Channel</span>, <span class='ident'>sender</span>: <span class='kw-2'>&amp;</span><span class='ident'>ChannelUser</span>, <span class='ident'>message</span>: <span class='kw-2'>&amp;</span><span class='ident'>str</span>) {}
 
     <span class='doccomment'>/// When a private message is received.</span>
     <span class='attribute'>#[<span class='ident'>allow</span>(<span class='ident'>unused_variables</span>)]</span>
