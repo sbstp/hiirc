@@ -45,12 +45,11 @@
             <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                 [<span class='inner'>&#x2212;</span>]
             </a>
-        </span><a id='src-9932' class='srclink' href='../src/loirc/message.rs.html#16-25' title='goto source code'>[src]</a></span></h1>
+        </span><a id='src-9932' class='srclink' href='../src/loirc/message.rs.html#16-23' title='goto source code'>[src]</a></span></h1>
 <pre class='rust struct'>pub struct Message {
     pub prefix: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='enum' href='../loirc/enum.Prefix.html' title='loirc::Prefix'>Prefix</a>&gt;,
     pub code: <a class='enum' href='../loirc/enum.Code.html' title='loirc::Code'>Code</a>,
     pub args: <a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a>&gt;,
-    pub suffix: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a>&gt;,
 }</pre><div class='docblock'><p>Represents a message received from the server.</p>
 </div><h2 class='fields'>Fields</h2>
 <table><tr class='stab '>
@@ -59,8 +58,6 @@
                                   <td id='structfield.code'><code>code</code></td><td><div class='docblock'><p>Code</p>
 </div></td></tr><tr class='stab '>
                                   <td id='structfield.args'><code>args</code></td><td><div class='docblock'><p>Arguments</p>
-</div></td></tr><tr class='stab '>
-                                  <td id='structfield.suffix'><code>suffix</code></td><td><div class='docblock'><p>Suffix</p>
 </div></td></tr></table><h2 id='methods'>Methods</h2><h3 class='impl'><code>impl <a class='struct' href='../loirc/struct.Message.html' title='loirc::Message'>Message</a></code></h3><div class='impl-items'><h4 id='method.parse' class='method'><code>fn <a href='#method.parse' class='fnname'>parse</a>(line: &amp;<a href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='struct' href='../loirc/struct.Message.html' title='loirc::Message'>Message</a>, <a class='enum' href='../loirc/enum.ParseError.html' title='loirc::ParseError'>ParseError</a>&gt;</code></h4>
 <div class='docblock'><p>Parse the given string into a <code>Message</code> struct.</p>
 
