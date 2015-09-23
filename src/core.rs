@@ -130,9 +130,9 @@ pub struct Settings<'a> {
 /// Represents the state of this connection.
 pub struct Irc {
     writer: Writer,
+    channels: HashMap<String, Channel>,
     /// Status of the connection.
     pub status: ConnectionStatus,
-    channels: HashMap<String, Channel>,
 }
 
 impl Irc {
