@@ -34,7 +34,7 @@ impl ChannelUser {
             _ => ChannelUserStatus::Normal,
         };
         ChannelUser {
-            name: (if status == ChannelUserStatus::Normal { raw } else { &raw[1..] }).to_owned(),
+            name: (if status == ChannelUserStatus::Normal { raw } else { &raw[1..] }).into(),
             status: status,
         }
     }
@@ -158,8 +158,8 @@ impl Irc {
     // Ensure a channel if it does not exist.
     fn ensure_channel_exists(&mut self, name: &str, id: &str) {
         if !self.channels.contains_key(id) {
-            self.channels.insert(id.to_owned(), Channel {
-                name: name.to_owned(),
+            self.channels.insert(id.into(), Channel {
+                name: name.into(),
                 users: Vec::new(),
                 topic: None,
             });
@@ -171,7 +171,7 @@ impl Irc {
         channel.topic = if topic.len() == 0 {
             None
         } else {
-            Some(topic.to_owned())
+            Some(topic.into())
         };
     }
 
@@ -483,7 +483,7 @@ impl<'a> Dispatch<'a> {
         for (_, channel) in self.irc.channels.iter_mut() {
             for user in channel.users.iter_mut() {
                 if user.name == prefix.nickname {
-                    user.name = newname.to_owned();
+                    user.name = newname.clone();
                 }
             }
         }
