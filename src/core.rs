@@ -374,7 +374,7 @@ impl<'a> Dispatch<'a> {
     fn name_reply(&mut self, msg: &Message) {
         let channel_name = some_or_return!(msg.args.get(2));
         let channel_id = channel_name.to_lowercase();
-        let user_list = some_or_return!(msg.suffix.as_ref());
+        let user_list = some_or_return!(msg.args.last());
 
         self.irc.ensure_channel_exists(channel_name, &channel_id);
         for raw in user_list.split(" ") {
@@ -389,7 +389,7 @@ impl<'a> Dispatch<'a> {
     }
 
     fn topic(&mut self, msg: &Message) {
-        let topic = some_or_return!(msg.suffix.as_ref());
+        let topic = some_or_return!(msg.args.last());
         let channel_name = some_or_return!(msg.args.get(0));
         let channel_id = channel_name.to_lowercase();
 
@@ -401,7 +401,7 @@ impl<'a> Dispatch<'a> {
     }
 
     fn rpl_topic(&mut self, msg: &Message) {
-        let topic = some_or_return!(msg.suffix.as_ref());
+        let topic = some_or_return!(msg.args.last());
         let channel_name = some_or_return!(msg.args.get(1));
         let channel_id = channel_name.to_lowercase();
 
@@ -449,7 +449,7 @@ impl<'a> Dispatch<'a> {
 
     fn privmsg(&mut self, msg: &Message) {
         let prefix = user_or_return!(msg.prefix);
-        let text = some_or_return!(msg.suffix.as_ref());
+        let text = some_or_return!(msg.args.last());
         let source = some_or_return!(msg.args.get(0));
 
         if source.starts_with("#") {
