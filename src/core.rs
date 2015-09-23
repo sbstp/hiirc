@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 use std::io;
+use std::slice::Iter;
 
 use listener::Listener;
 use loirc::{self, connect};
@@ -43,10 +44,9 @@ impl ChannelUser {
 /// Represents a channel.
 #[derive(Debug)]
 pub struct Channel {
+    users: Vec<ChannelUser>,
     /// Name of the channel.
     pub name: String,
-    /// List of users by nickname.
-    pub users: Vec<ChannelUser>,
     /// Topic of the channel.
     pub topic: Option<String>,
 }
@@ -59,6 +59,11 @@ impl Channel {
             Some(idx) => Some(&self.users[idx]),
             None => None,
         }
+    }
+
+    /// Get an iterator that iterates over the channel's users.
+    pub fn users(&self) -> Iter<ChannelUser> {
+        self.users.iter()
     }
 
 }
