@@ -71,4 +71,8 @@ pub trait Listener {
     #[allow(unused_variables)]
     fn topic_change(&mut self, irc: &Irc, channel: &Channel, topic: Option<&str>) {}
 
+    /// When the nick of a user changes.
+    #[allow(unused_variables)]
+    fn nick_change(&mut self, irc: &Irc, oldnick: &str, newnick: &str) {}
+
 }

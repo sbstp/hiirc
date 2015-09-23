@@ -364,6 +364,9 @@ impl<'a> Dispatch<'a> {
                     Code::Quit => {
                         self.quit(msg);
                     }
+                    Code::Nick => {
+                        self.nick(msg);
+                    }
                     _ => {}
                 }
             }
@@ -471,6 +474,21 @@ impl<'a> Dispatch<'a> {
         }
 
         self.listener.user_quit(&self.irc, &user.nickname);
+    }
+
+    fn nick(&mut self, msg: &Message) {
+        let prefix = user_or_return!(msg.prefix);
+        let newname = some_or_return!(msg.args.last());
+
+        for (_, channel) in self.irc.channels.iter_mut() {
+            for user in channel.users.iter_mut() {
+                if user.name == prefix.nickname {
+                    user.name = newname.to_owned();
+                }
+            }
+        }
+
+        self.listener.nick_change(&self.irc, &prefix.nickname, &newname);
     }
 
 }
