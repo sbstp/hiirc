@@ -21,7 +21,7 @@ pub enum ChannelUserStatus {
 #[derive(Debug)]
 pub struct ChannelUser {
     /// Nickname of the user.
-    pub name: String,
+    pub nickname: String,
     /// Status of the user inside the channel.
     pub status: ChannelUserStatus,
 }
@@ -35,7 +35,7 @@ impl ChannelUser {
             _ => ChannelUserStatus::Normal,
         };
         ChannelUser {
-            name: (if status == ChannelUserStatus::Normal { raw } else { &raw[1..] }).into(),
+            nickname: (if status == ChannelUserStatus::Normal { raw } else { &raw[1..] }).into(),
             status: status,
         }
     }
@@ -55,7 +55,7 @@ impl Channel {
 
     /// Get a user by nickname from this channel.
     pub fn get_user(&self, nickname: &str) -> Option<&ChannelUser> {
-        match self.users.iter().position(|u| u.name == nickname) {
+        match self.users.iter().position(|u| u.nickname == nickname) {
             Some(idx) => Some(&self.users[idx]),
             None => None,
         }
@@ -187,7 +187,7 @@ impl Irc {
 
     fn channel_del_user(&mut self, channel_id: &str, nickname: &str) {
         let channel = some_or_return!(self.channels.get_mut(channel_id));
-        if let Some(pos) = channel.users.iter().position(|u| u.name == nickname) {
+        if let Some(pos) = channel.users.iter().position(|u| u.nickname == nickname) {
             channel.users.remove(pos);
         }
     }
@@ -473,7 +473,7 @@ impl<'a> Dispatch<'a> {
         let user = user_or_return!(msg.prefix);
 
         for (_, channel) in self.irc.channels.iter_mut() {
-            if let Some(pos) = channel.users.iter().position(|u| &u.name == &user.nickname) {
+            if let Some(pos) = channel.users.iter().position(|u| u.nickname == user.nickname) {
                 channel.users.remove(pos);
             }
         }
@@ -487,8 +487,8 @@ impl<'a> Dispatch<'a> {
 
         for (_, channel) in self.irc.channels.iter_mut() {
             for user in channel.users.iter_mut() {
-                if user.name == prefix.nickname {
-                    user.name = newname.clone();
+                if user.nickname == prefix.nickname {
+                    user.nickname = newname.clone();
                 }
             }
         }
@@ -501,20 +501,20 @@ impl<'a> Dispatch<'a> {
 #[test]
 fn test_user_from_raw_norm() {
     let user = ChannelUser::from_raw("TEST");
-    assert_eq!(&user.name, "TEST");
+    assert_eq!(&user.nickname, "TEST");
     assert_eq!(user.status, ChannelUserStatus::Normal);
 }
 
 #[test]
 fn test_user_from_raw_voice() {
     let user = ChannelUser::from_raw("+TEst");
-    assert_eq!(&user.name, "TEst");
+    assert_eq!(&user.nickname, "TEst");
     assert_eq!(user.status, ChannelUserStatus::Voice);
 }
 
 #[test]
 fn test_user_from_raw_op() {
     let user = ChannelUser::from_raw("@test");
-    assert_eq!(&user.name, "test");
+    assert_eq!(&user.nickname, "test");
     assert_eq!(user.status, ChannelUserStatus::Operator);
 }
