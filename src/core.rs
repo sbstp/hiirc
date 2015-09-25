@@ -185,11 +185,13 @@ impl Irc {
         channel.users.push(ChannelUser::from_raw(raw));
     }
 
-    fn channel_del_user(&mut self, channel_id: &str, nickname: &str) {
-        let channel = some_or_return!(self.channels.get_mut(channel_id));
-        if let Some(pos) = channel.users.iter().position(|u| u.nickname == nickname) {
-            channel.users.remove(pos);
+    fn channel_del_user(&mut self, channel_id: &str, nickname: &str) -> Option<ChannelUser> {
+        if let Some(channel) = self.channels.get_mut(channel_id) {
+            if let Some(pos) = channel.users.iter().position(|u| u.nickname == nickname) {
+                return Some(channel.users.remove(pos));
+            }
         }
+        None
     }
 
     /// Check if the underlying connection is closed.
@@ -372,6 +374,9 @@ impl<'a> Dispatch<'a> {
                     Code::Nick => {
                         self.nick(msg);
                     }
+                    Code::Kick => {
+                        self.kick(msg);
+                    }
                     _ => {}
                 }
             }
@@ -494,6 +499,16 @@ impl<'a> Dispatch<'a> {
         }
 
         self.listener.nick_change(&self.irc, &prefix.nickname, &newname);
+    }
+
+    fn kick(&mut self, msg: &Message) {
+        let kicked_user = some_or_return!(msg.args.last());
+        let channel_name = some_or_return!(msg.args.get(0));
+        let channel_id = channel_name.to_lowercase();
+
+        let channel_user = some_or_return!(self.irc.channel_del_user(&channel_id, kicked_user));
+        let channel = some_or_return!(self.irc.get_channel_by_id(&channel_id));
+        self.listener.kick(&self.irc, &channel, &channel_user);
     }
 
 }

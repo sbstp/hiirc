@@ -75,4 +75,8 @@ pub trait Listener {
     #[allow(unused_variables)]
     fn nick_change(&mut self, irc: &Irc, oldnick: &str, newnick: &str) {}
 
+    /// When a user gets kicked from a channel.
+    #[allow(unused_variables)]
+    fn kick(&mut self, irc: &Irc, channel: &Channel, user: &ChannelUser) {}
+
 }
