@@ -79,4 +79,12 @@ pub trait Listener {
     #[allow(unused_variables)]
     fn kick(&mut self, irc: &Irc, channel: &Channel, user: &ChannelUser) {}
 
+    /// When the server sends a ping message.
+    #[allow(unused_variables)]
+    fn ping(&mut self, irc: &Irc, server: &str) {}
+
+    /// When the server sends a pong message.
+    #[allow(unused_variables)]
+    fn pong(&mut self, irc: &Irc, server: &str) {}
+
 }

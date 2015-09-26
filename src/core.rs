@@ -377,6 +377,12 @@ impl<'a> Dispatch<'a> {
                     Code::Kick => {
                         self.kick(msg);
                     }
+                    Code::Ping => {
+                        self.ping(msg);
+                    }
+                    Code::Pong => {
+                        self.pong(msg);
+                    }
                     _ => {}
                 }
             }
@@ -509,6 +515,17 @@ impl<'a> Dispatch<'a> {
         let channel_user = some_or_return!(self.irc.channel_del_user(&channel_id, kicked_user));
         let channel = some_or_return!(self.irc.get_channel_by_id(&channel_id));
         self.listener.kick(&self.irc, &channel, &channel_user);
+    }
+
+    fn ping(&mut self, msg: &Message) {
+        let server = some_or_return!(msg.args.last());
+        let _ = self.irc.pong(server);
+        self.listener.ping(&self.irc, server);
+    }
+
+    fn pong(&mut self, msg: &Message) {
+        let server = some_or_return!(msg.args.last());
+        self.listener.pong(&self.irc, server);
     }
 
 }
