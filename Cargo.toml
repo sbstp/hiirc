@@ -3,5 +3,5 @@ name = "hiirc"
 version = "0.1.0"
 authors = ["Simon Bernier St-Pierre <sbernierstpierre@gmail.com>"]
 
-[dependencies.loirc]
-git = "https://github.com/SBSTP/loirc"
+[dependencies]
+loirc = "0.1.3"
