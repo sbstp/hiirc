@@ -575,6 +575,34 @@
 <span id="533">533</span>
 <span id="534">534</span>
 <span id="535">535</span>
+<span id="536">536</span>
+<span id="537">537</span>
+<span id="538">538</span>
+<span id="539">539</span>
+<span id="540">540</span>
+<span id="541">541</span>
+<span id="542">542</span>
+<span id="543">543</span>
+<span id="544">544</span>
+<span id="545">545</span>
+<span id="546">546</span>
+<span id="547">547</span>
+<span id="548">548</span>
+<span id="549">549</span>
+<span id="550">550</span>
+<span id="551">551</span>
+<span id="552">552</span>
+<span id="553">553</span>
+<span id="554">554</span>
+<span id="555">555</span>
+<span id="556">556</span>
+<span id="557">557</span>
+<span id="558">558</span>
+<span id="559">559</span>
+<span id="560">560</span>
+<span id="561">561</span>
+<span id="562">562</span>
+<span id="563">563</span>
 </pre><pre class='rust '>
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>collections</span>::<span class='ident'>HashMap</span>;
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>io</span>;
@@ -944,7 +972,10 @@
                         <span class='self'>self</span>.<span class='ident'>part</span>(<span class='ident'>msg</span>);
                     }
                     <span class='ident'>Code</span>::<span class='ident'>Privmsg</span> <span class='op'>=&gt;</span> {
-                        <span class='self'>self</span>.<span class='ident'>privmsg</span>(<span class='ident'>msg</span>);
+                        <span class='self'>self</span>.<span class='ident'>message</span>(<span class='ident'>msg</span>, <span class='boolval'>false</span>);
+                    }
+                    <span class='ident'>Code</span>::<span class='ident'>Notice</span> <span class='op'>=&gt;</span> {
+                        <span class='self'>self</span>.<span class='ident'>message</span>(<span class='ident'>msg</span>, <span class='boolval'>true</span>);
                     }
                     <span class='ident'>Code</span>::<span class='ident'>Quit</span> <span class='op'>=&gt;</span> {
                         <span class='self'>self</span>.<span class='ident'>quit</span>(<span class='ident'>msg</span>);
@@ -954,6 +985,12 @@
                     }
                     <span class='ident'>Code</span>::<span class='ident'>Kick</span> <span class='op'>=&gt;</span> {
                         <span class='self'>self</span>.<span class='ident'>kick</span>(<span class='ident'>msg</span>);
+                    }
+                    <span class='ident'>Code</span>::<span class='ident'>Ping</span> <span class='op'>=&gt;</span> {
+                        <span class='self'>self</span>.<span class='ident'>ping</span>(<span class='ident'>msg</span>);
+                    }
+                    <span class='ident'>Code</span>::<span class='ident'>Pong</span> <span class='op'>=&gt;</span> {
+                        <span class='self'>self</span>.<span class='ident'>pong</span>(<span class='ident'>msg</span>);
                     }
                     _ <span class='op'>=&gt;</span> {}
                 }
@@ -1038,7 +1075,7 @@
         <span class='self'>self</span>.<span class='ident'>listener</span>.<span class='ident'>user_part</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>irc</span>, <span class='ident'>channel</span>, <span class='ident'>user</span>);
     }
 
-    <span class='kw'>fn</span> <span class='ident'>privmsg</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>msg</span>: <span class='kw-2'>&amp;</span><span class='ident'>Message</span>) {
+    <span class='kw'>fn</span> <span class='ident'>message</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>msg</span>: <span class='kw-2'>&amp;</span><span class='ident'>Message</span>, <span class='ident'>notice</span>: <span class='ident'>bool</span>) {
         <span class='kw'>let</span> <span class='ident'>prefix</span> <span class='op'>=</span> <span class='macro'>user_or_return</span><span class='macro'>!</span>(<span class='ident'>msg</span>.<span class='ident'>prefix</span>);
         <span class='kw'>let</span> <span class='ident'>text</span> <span class='op'>=</span> <span class='macro'>some_or_return</span><span class='macro'>!</span>(<span class='ident'>msg</span>.<span class='ident'>args</span>.<span class='ident'>last</span>());
         <span class='kw'>let</span> <span class='ident'>source</span> <span class='op'>=</span> <span class='macro'>some_or_return</span><span class='macro'>!</span>(<span class='ident'>msg</span>.<span class='ident'>args</span>.<span class='ident'>get</span>(<span class='number'>0</span>));
@@ -1046,9 +1083,17 @@
         <span class='kw'>if</span> <span class='ident'>source</span>.<span class='ident'>starts_with</span>(<span class='string'>&quot;#&quot;</span>) {
             <span class='kw'>let</span> <span class='ident'>channel</span> <span class='op'>=</span> <span class='macro'>some_or_return</span><span class='macro'>!</span>(<span class='self'>self</span>.<span class='ident'>irc</span>.<span class='ident'>get_channel_by_name</span>(<span class='kw-2'>&amp;</span><span class='ident'>source</span>));
             <span class='kw'>let</span> <span class='ident'>user</span> <span class='op'>=</span> <span class='macro'>some_or_return</span><span class='macro'>!</span>(<span class='ident'>channel</span>.<span class='ident'>get_user</span>(<span class='kw-2'>&amp;</span><span class='ident'>prefix</span>.<span class='ident'>nickname</span>));
-            <span class='self'>self</span>.<span class='ident'>listener</span>.<span class='ident'>channel_msg</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>irc</span>, <span class='ident'>channel</span>, <span class='ident'>user</span>, <span class='ident'>text</span>);
+            <span class='kw'>if</span> <span class='op'>!</span><span class='ident'>notice</span> {
+                <span class='self'>self</span>.<span class='ident'>listener</span>.<span class='ident'>channel_msg</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>irc</span>, <span class='ident'>channel</span>, <span class='ident'>user</span>, <span class='ident'>text</span>);
+            } <span class='kw'>else</span> {
+                <span class='self'>self</span>.<span class='ident'>listener</span>.<span class='ident'>channel_notice</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>irc</span>, <span class='ident'>channel</span>, <span class='ident'>user</span>, <span class='ident'>text</span>);
+            }
         } <span class='kw'>else</span> {
-            <span class='self'>self</span>.<span class='ident'>listener</span>.<span class='ident'>private_msg</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>irc</span>, <span class='kw-2'>&amp;</span><span class='ident'>prefix</span>.<span class='ident'>nickname</span>, <span class='ident'>text</span>);
+            <span class='kw'>if</span> <span class='op'>!</span><span class='ident'>notice</span> {
+                <span class='self'>self</span>.<span class='ident'>listener</span>.<span class='ident'>private_msg</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>irc</span>, <span class='kw-2'>&amp;</span><span class='ident'>prefix</span>.<span class='ident'>nickname</span>, <span class='ident'>text</span>);
+            } <span class='kw'>else</span> {
+                <span class='self'>self</span>.<span class='ident'>listener</span>.<span class='ident'>private_notice</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>irc</span>, <span class='kw-2'>&amp;</span><span class='ident'>prefix</span>.<span class='ident'>nickname</span>, <span class='ident'>text</span>);
+            }
         }
     }
 
@@ -1087,6 +1132,17 @@
         <span class='kw'>let</span> <span class='ident'>channel_user</span> <span class='op'>=</span> <span class='macro'>some_or_return</span><span class='macro'>!</span>(<span class='self'>self</span>.<span class='ident'>irc</span>.<span class='ident'>channel_del_user</span>(<span class='kw-2'>&amp;</span><span class='ident'>channel_id</span>, <span class='ident'>kicked_user</span>));
         <span class='kw'>let</span> <span class='ident'>channel</span> <span class='op'>=</span> <span class='macro'>some_or_return</span><span class='macro'>!</span>(<span class='self'>self</span>.<span class='ident'>irc</span>.<span class='ident'>get_channel_by_id</span>(<span class='kw-2'>&amp;</span><span class='ident'>channel_id</span>));
         <span class='self'>self</span>.<span class='ident'>listener</span>.<span class='ident'>kick</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>irc</span>, <span class='kw-2'>&amp;</span><span class='ident'>channel</span>, <span class='kw-2'>&amp;</span><span class='ident'>channel_user</span>);
+    }
+
+    <span class='kw'>fn</span> <span class='ident'>ping</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>msg</span>: <span class='kw-2'>&amp;</span><span class='ident'>Message</span>) {
+        <span class='kw'>let</span> <span class='ident'>server</span> <span class='op'>=</span> <span class='macro'>some_or_return</span><span class='macro'>!</span>(<span class='ident'>msg</span>.<span class='ident'>args</span>.<span class='ident'>last</span>());
+        <span class='kw'>let</span> _ <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>irc</span>.<span class='ident'>pong</span>(<span class='ident'>server</span>);
+        <span class='self'>self</span>.<span class='ident'>listener</span>.<span class='ident'>ping</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>irc</span>, <span class='ident'>server</span>);
+    }
+
+    <span class='kw'>fn</span> <span class='ident'>pong</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>msg</span>: <span class='kw-2'>&amp;</span><span class='ident'>Message</span>) {
+        <span class='kw'>let</span> <span class='ident'>server</span> <span class='op'>=</span> <span class='macro'>some_or_return</span><span class='macro'>!</span>(<span class='ident'>msg</span>.<span class='ident'>args</span>.<span class='ident'>last</span>());
+        <span class='self'>self</span>.<span class='ident'>listener</span>.<span class='ident'>pong</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>irc</span>, <span class='ident'>server</span>);
     }
 
 }
