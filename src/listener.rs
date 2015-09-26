@@ -52,9 +52,17 @@ pub trait Listener {
     #[allow(unused_variables)]
     fn channel_msg(&mut self, irc: &Irc, channel: &Channel, sender: &ChannelUser, message: &str) {}
 
+    /// When a channel notice is received.
+    #[allow(unused_variables)]
+    fn channel_notice(&mut self, irc: &Irc, channel: &Channel, sender: &ChannelUser, message: &str) {}
+
     /// When a private message is received.
     #[allow(unused_variables)]
     fn private_msg(&mut self, irc: &Irc, sender: &str, message: &str) {}
+
+    /// When a private notice is received.
+    #[allow(unused_variables)]
+    fn private_notice(&mut self, irc: &Irc, sender: &str, message: &str) {}
 
     /// Reply to a `get_topic` command and when joining a channel.
     ///

@@ -366,7 +366,10 @@ impl<'a> Dispatch<'a> {
                         self.part(msg);
                     }
                     Code::Privmsg => {
-                        self.privmsg(msg);
+                        self.message(msg, false);
+                    }
+                    Code::Notice => {
+                        self.message(msg, true);
                     }
                     Code::Quit => {
                         self.quit(msg);
@@ -466,7 +469,7 @@ impl<'a> Dispatch<'a> {
         self.listener.user_part(&self.irc, channel, user);
     }
 
-    fn privmsg(&mut self, msg: &Message) {
+    fn message(&mut self, msg: &Message, notice: bool) {
         let prefix = user_or_return!(msg.prefix);
         let text = some_or_return!(msg.args.last());
         let source = some_or_return!(msg.args.get(0));
@@ -474,9 +477,17 @@ impl<'a> Dispatch<'a> {
         if source.starts_with("#") {
             let channel = some_or_return!(self.irc.get_channel_by_name(&source));
             let user = some_or_return!(channel.get_user(&prefix.nickname));
-            self.listener.channel_msg(&self.irc, channel, user, text);
+            if !notice {
+                self.listener.channel_msg(&self.irc, channel, user, text);
+            } else {
+                self.listener.channel_notice(&self.irc, channel, user, text);
+            }
         } else {
-            self.listener.private_msg(&self.irc, &prefix.nickname, text);
+            if !notice {
+                self.listener.private_msg(&self.irc, &prefix.nickname, text);
+            } else {
+                self.listener.private_notice(&self.irc, &prefix.nickname, text);
+            }
         }
     }
 
