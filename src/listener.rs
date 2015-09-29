@@ -1,13 +1,28 @@
 use loirc::Event;
 
-use {Channel, ChannelUser, Irc};
+use {Channel, ChannelUser, Code, Irc, Message};
 
 /// Implement this trait to handle events.
 pub trait Listener {
 
     /// Any event.
+    ///
+    /// This includes everything sent by the irc server, i/o errors, disconnects, reconnects, etc.
     #[allow(unused_variables)]
     fn any(&mut self, irc: &Irc, event: &Event) {}
+
+    /// Any message.
+    ///
+    /// This is not to be confused with `channel_msg` or `private_msg`!
+    /// Messages are a subset of events, they're what the irc server sends.
+    #[allow(unused_variables)]
+    fn msg(&mut self, irc: &Irc, msg: &Message) {}
+
+    /// Any error message.
+    ///
+    /// When the server sends an error message.
+    #[allow(unused_variables)]
+    fn error_msg(&mut self, irc: &Irc, code: &Code, err: &Message) {}
 
     /// When the connection is closed.
     ///
@@ -94,5 +109,4 @@ pub trait Listener {
     /// When the server sends a pong message.
     #[allow(unused_variables)]
     fn pong(&mut self, irc: &Irc, server: &str) {}
-
 }

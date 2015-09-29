@@ -340,6 +340,10 @@ impl<'a> Dispatch<'a> {
                 self.listener.reconnect(&self.irc);
             }
             Event::Message(ref msg) => {
+                self.listener.msg(&self.irc, &msg);
+                if msg.code.is_error() {
+                    self.listener.error_msg(&self.irc, &msg.code, &msg);
+                }
                 match msg.code {
                     Code::RplWelcome => {
                         self.listener.welcome(&self.irc);
