@@ -45,9 +45,11 @@
             <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                 [<span class='inner'>&#x2212;</span>]
             </a>
-        </span><a id='src-3225' class='srclink' href='../src/hiirc/listener.rs.html#6-98' title='goto source code'>[src]</a></span></h1>
+        </span><a id='src-3254' class='srclink' href='../src/hiirc/listener.rs.html#6-112' title='goto source code'>[src]</a></span></h1>
 <pre class='rust trait'>pub trait Listener {
     fn <a href='#method.any' class='fnname'>any</a>(&amp;mut self, irc: &amp;<a class='struct' href='../hiirc/struct.Irc.html' title='hiirc::Irc'>Irc</a>, event: &amp;<a class='enum' href='../hiirc/enum.Event.html' title='hiirc::Event'>Event</a>) { ... }
+    fn <a href='#method.msg' class='fnname'>msg</a>(&amp;mut self, irc: &amp;<a class='struct' href='../hiirc/struct.Irc.html' title='hiirc::Irc'>Irc</a>, msg: &amp;<a class='struct' href='../hiirc/struct.Message.html' title='hiirc::Message'>Message</a>) { ... }
+    fn <a href='#method.error_msg' class='fnname'>error_msg</a>(&amp;mut self, irc: &amp;<a class='struct' href='../hiirc/struct.Irc.html' title='hiirc::Irc'>Irc</a>, code: &amp;<a class='enum' href='../hiirc/enum.Code.html' title='hiirc::Code'>Code</a>, err: &amp;<a class='struct' href='../hiirc/struct.Message.html' title='hiirc::Message'>Message</a>) { ... }
     fn <a href='#method.close' class='fnname'>close</a>(&amp;mut self, irc: &amp;<a class='struct' href='../hiirc/struct.Irc.html' title='hiirc::Irc'>Irc</a>, reason: &amp;<a href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>) { ... }
     fn <a href='#method.disconnect' class='fnname'>disconnect</a>(&amp;mut self, irc: &amp;<a class='struct' href='../hiirc/struct.Irc.html' title='hiirc::Irc'>Irc</a>) { ... }
     fn <a href='#method.reconnecting' class='fnname'>reconnecting</a>(&amp;mut self, irc: &amp;<a class='struct' href='../hiirc/struct.Irc.html' title='hiirc::Irc'>Irc</a>) { ... }
@@ -72,6 +74,15 @@
             <h2 id='provided-methods'>Provided Methods</h2>
             <div class='methods'>
         <h3 id='method.any' class='method stab '><code>fn <a href='#method.any' class='fnname'>any</a>(&amp;mut self, irc: &amp;<a class='struct' href='../hiirc/struct.Irc.html' title='hiirc::Irc'>Irc</a>, event: &amp;<a class='enum' href='../hiirc/enum.Event.html' title='hiirc::Event'>Event</a>)</code></h3><div class='docblock'><p>Any event.</p>
+
+<p>This includes everything sent by the irc server, i/o errors, disconnects, reconnects, etc.</p>
+</div><h3 id='method.msg' class='method stab '><code>fn <a href='#method.msg' class='fnname'>msg</a>(&amp;mut self, irc: &amp;<a class='struct' href='../hiirc/struct.Irc.html' title='hiirc::Irc'>Irc</a>, msg: &amp;<a class='struct' href='../hiirc/struct.Message.html' title='hiirc::Message'>Message</a>)</code></h3><div class='docblock'><p>Any message.</p>
+
+<p>This is not to be confused with <code>channel_msg</code> or <code>private_msg</code>!
+Messages are a subset of events, they&#39;re what the irc server sends.</p>
+</div><h3 id='method.error_msg' class='method stab '><code>fn <a href='#method.error_msg' class='fnname'>error_msg</a>(&amp;mut self, irc: &amp;<a class='struct' href='../hiirc/struct.Irc.html' title='hiirc::Irc'>Irc</a>, code: &amp;<a class='enum' href='../hiirc/enum.Code.html' title='hiirc::Code'>Code</a>, err: &amp;<a class='struct' href='../hiirc/struct.Message.html' title='hiirc::Message'>Message</a>)</code></h3><div class='docblock'><p>Any error message.</p>
+
+<p>When the server sends an error message.</p>
 </div><h3 id='method.close' class='method stab '><code>fn <a href='#method.close' class='fnname'>close</a>(&amp;mut self, irc: &amp;<a class='struct' href='../hiirc/struct.Irc.html' title='hiirc::Irc'>Irc</a>, reason: &amp;<a href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>)</code></h3><div class='docblock'><p>When the connection is closed.</p>
 
 <p>It can happen if you manually close the connection, if you set the <code>ReconnectionSettings</code>
