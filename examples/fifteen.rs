@@ -17,7 +17,7 @@ struct Fifteen {
     reply_to_ping: bool,
 }
 
-static NICKNAME: &'static str = "fifteenistimeout";
+static NICKNAME: &'static str = "FifteenIsTimeout";
 static USERNAME: &'static str = "hiirc";
 static REALNAME: &'static str = "Fifteen should stop timing out";
 
