@@ -1,5 +1,5 @@
 # hiirc
-**hiirc** is a high level **irc** client library. The primary goal is for it to be easy to use and featureful.
+**hiirc** is a **hi**gh level **irc** client library. The primary goal is for it to be easy to use and featureful.
 It's build on top of [loirc](https://github.com/sbstp/loirc) and offers the same stability and reliability but
 with a much friendlier and abstract interface.
 
