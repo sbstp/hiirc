@@ -3,8 +3,9 @@ use std::io;
 use std::slice::Iter;
 
 use listener::Listener;
+use settings::Settings;
 use loirc::{self, connect};
-use loirc::{ActivityMonitor, Code, Event, Message, MonitorSettings, Prefix, ReconnectionSettings, Writer};
+use loirc::{ActivityMonitor, Code, Event, Message, Prefix, Writer};
 
 /// Represents the status of a user inside of a channel.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
@@ -114,22 +115,6 @@ impl From<io::Error> for Error {
     fn from(err: io::Error) -> Error {
         Error::IoError(err)
     }
-}
-
-/// Settings for the dispatcher.
-pub struct Settings<'a> {
-    /// Address of the irc server.
-    pub addr: &'a str,
-    /// Preferred nickname.
-    pub nickname: &'a str,
-    /// Username.
-    pub username: &'a str,
-    /// Real name.
-    pub realname: &'a str,
-    /// Reconnection settings. If None, reconnection is disabled.
-    pub reco_settings: Option<ReconnectionSettings>,
-    /// Monitor settings. If None, monitoring is disabled.
-    pub mon_settings: Option<MonitorSettings>,
 }
 
 /// Represents the state of this connection.
@@ -285,17 +270,17 @@ impl Irc {
 
 /// Create an irc client with the listener and settings.
 pub fn dispatch<L: Listener>(listener: L, settings: Settings) -> Result<(), Error> {
-    let reco_settings = settings.reco_settings.unwrap_or(ReconnectionSettings::DoNotReconnect);
-    let (writer, reader) = try!(connect(settings.addr, reco_settings));
+    let (writer, reader) = try!(connect(settings.addr, settings.reconnection));
 
     let irc = Irc::new(writer.clone());
     try!(irc.nick(settings.nickname));
     try!(irc.user(settings.username, settings.realname));
 
     let mut dispatch = Dispatch {
-        am: settings.mon_settings.map(|s| ActivityMonitor::new(&writer, s)),
+        am: settings.monitor.map(|s| ActivityMonitor::new(&writer, s)),
         listener: Box::new(listener),
         irc: irc,
+        settings: settings,
     };
 
     for event in reader.iter() {
@@ -309,6 +294,7 @@ struct Dispatch<'a> {
     am: Option<ActivityMonitor>,
     listener: Box<Listener + 'a>,
     irc: Irc,
+    settings: Settings<'a>,
 }
 
 impl<'a> Dispatch<'a> {
@@ -337,6 +323,10 @@ impl<'a> Dispatch<'a> {
             }
             Event::Reconnected => {
                 self.irc.status = ConnectionStatus::Connected;
+                if self.settings.auto_ident {
+                    let _ = self.irc.user(self.settings.username, self.settings.realname);
+                    let _ = self.irc.nick(self.settings.nickname);
+                }
                 self.listener.reconnect(&self.irc);
             }
             Event::Message(ref msg) => {
@@ -534,7 +524,9 @@ impl<'a> Dispatch<'a> {
 
     fn ping(&mut self, msg: &Message) {
         let server = some_or_return!(msg.args.last());
-        let _ = self.irc.pong(server);
+        if self.settings.auto_ping {
+            let _ = self.irc.pong(server);
+        }
         self.listener.ping(&self.irc, server);
     }
 

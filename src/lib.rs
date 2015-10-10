@@ -13,10 +13,12 @@ mod macros;
 mod core;
 pub mod ext;
 mod listener;
+mod settings;
 
 pub use core::{dispatch};
-pub use core::{Channel, ConnectionStatus, Error, Irc, Settings, ChannelUser, ChannelUserStatus};
+pub use core::{Channel, ConnectionStatus, Error, Irc, ChannelUser, ChannelUserStatus};
 pub use listener::Listener;
+pub use settings::Settings;
 pub use loirc::Error as LoircError;
 pub use loirc::{Code, Duration, Event, Message, MonitorSettings, ParseError, Prefix, PrefixUser,
                 ReconnectionSettings};

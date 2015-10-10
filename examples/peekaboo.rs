@@ -42,12 +42,9 @@ fn main() {
     let args: Vec<String> = env::args().collect();
     let channel = args.get(1).expect("Channel must be given as an argument.");
 
-    dispatch(Peekaboo::new(channel), Settings {
-        addr: "irc.freenode.net:6667",
-        nickname: "peekaboo",
-        username: "peekaboo",
-        realname: "peekaboo",
-        reco_settings: None,
-        mon_settings: None,
-    }).expect("Failed to connect to server.");
+    let mut settings = Settings::new("irc.freenode.net:6667", "peekaboo");
+    settings.username = "peekaboo";
+    settings.realname = "peekaboo";
+
+    dispatch(Peekaboo::new(channel), settings).unwrap();
 }
