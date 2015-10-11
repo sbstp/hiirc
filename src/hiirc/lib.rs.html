@@ -62,6 +62,8 @@
 <span id="20">20</span>
 <span id="21">21</span>
 <span id="22">22</span>
+<span id="23">23</span>
+<span id="24">24</span>
 </pre><pre class='rust '>
 <span class='attribute'>#<span class='op'>!</span>[<span class='ident'>deny</span>(<span class='ident'>missing_docs</span>)]</span>
 <span class='doccomment'>//! `hiirc` is a library built on top of [loirc](https://github.com/SBSTP/loirc). The goal</span>
@@ -78,10 +80,12 @@
 <span class='kw'>mod</span> <span class='ident'>core</span>;
 <span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>ext</span>;
 <span class='kw'>mod</span> <span class='ident'>listener</span>;
+<span class='kw'>mod</span> <span class='ident'>settings</span>;
 
 <span class='kw'>pub</span> <span class='kw'>use</span> <span class='ident'>core</span>::{<span class='ident'>dispatch</span>};
-<span class='kw'>pub</span> <span class='kw'>use</span> <span class='ident'>core</span>::{<span class='ident'>Channel</span>, <span class='ident'>ConnectionStatus</span>, <span class='ident'>Error</span>, <span class='ident'>Irc</span>, <span class='ident'>Settings</span>, <span class='ident'>ChannelUser</span>, <span class='ident'>ChannelUserStatus</span>};
+<span class='kw'>pub</span> <span class='kw'>use</span> <span class='ident'>core</span>::{<span class='ident'>Channel</span>, <span class='ident'>ConnectionStatus</span>, <span class='ident'>Error</span>, <span class='ident'>Irc</span>, <span class='ident'>ChannelUser</span>, <span class='ident'>ChannelUserStatus</span>};
 <span class='kw'>pub</span> <span class='kw'>use</span> <span class='ident'>listener</span>::<span class='ident'>Listener</span>;
+<span class='kw'>pub</span> <span class='kw'>use</span> <span class='ident'>settings</span>::<span class='ident'>Settings</span>;
 <span class='kw'>pub</span> <span class='kw'>use</span> <span class='ident'>loirc</span>::<span class='ident'>Error</span> <span class='kw'>as</span> <span class='ident'>LoircError</span>;
 <span class='kw'>pub</span> <span class='kw'>use</span> <span class='ident'>loirc</span>::{<span class='ident'>Code</span>, <span class='ident'>Duration</span>, <span class='ident'>Event</span>, <span class='ident'>Message</span>, <span class='ident'>MonitorSettings</span>, <span class='ident'>ParseError</span>, <span class='ident'>Prefix</span>, <span class='ident'>PrefixUser</span>,
                 <span class='ident'>ReconnectionSettings</span>};

@@ -599,22 +599,15 @@
 <span id="557">557</span>
 <span id="558">558</span>
 <span id="559">559</span>
-<span id="560">560</span>
-<span id="561">561</span>
-<span id="562">562</span>
-<span id="563">563</span>
-<span id="564">564</span>
-<span id="565">565</span>
-<span id="566">566</span>
-<span id="567">567</span>
 </pre><pre class='rust '>
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>collections</span>::<span class='ident'>HashMap</span>;
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>io</span>;
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>slice</span>::<span class='ident'>Iter</span>;
 
 <span class='kw'>use</span> <span class='ident'>listener</span>::<span class='ident'>Listener</span>;
+<span class='kw'>use</span> <span class='ident'>settings</span>::<span class='ident'>Settings</span>;
 <span class='kw'>use</span> <span class='ident'>loirc</span>::{<span class='self'>self</span>, <span class='ident'>connect</span>};
-<span class='kw'>use</span> <span class='ident'>loirc</span>::{<span class='ident'>ActivityMonitor</span>, <span class='ident'>Code</span>, <span class='ident'>Event</span>, <span class='ident'>Message</span>, <span class='ident'>MonitorSettings</span>, <span class='ident'>Prefix</span>, <span class='ident'>ReconnectionSettings</span>, <span class='ident'>Writer</span>};
+<span class='kw'>use</span> <span class='ident'>loirc</span>::{<span class='ident'>ActivityMonitor</span>, <span class='ident'>Code</span>, <span class='ident'>Event</span>, <span class='ident'>Message</span>, <span class='ident'>Prefix</span>, <span class='ident'>Writer</span>};
 
 <span class='doccomment'>/// Represents the status of a user inside of a channel.</span>
 <span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Clone</span>, <span class='ident'>Copy</span>, <span class='ident'>Debug</span>, <span class='ident'>Eq</span>, <span class='ident'>PartialEq</span>)]</span>
@@ -724,22 +717,6 @@
     <span class='kw'>fn</span> <span class='ident'>from</span>(<span class='ident'>err</span>: <span class='ident'>io</span>::<span class='ident'>Error</span>) <span class='op'>-&gt;</span> <span class='ident'>Error</span> {
         <span class='ident'>Error</span>::<span class='ident'>IoError</span>(<span class='ident'>err</span>)
     }
-}
-
-<span class='doccomment'>/// Settings for the dispatcher.</span>
-<span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>Settings</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span> {
-    <span class='doccomment'>/// Address of the irc server.</span>
-    <span class='kw'>pub</span> <span class='ident'>addr</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>str</span>,
-    <span class='doccomment'>/// Preferred nickname.</span>
-    <span class='kw'>pub</span> <span class='ident'>nickname</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>str</span>,
-    <span class='doccomment'>/// Username.</span>
-    <span class='kw'>pub</span> <span class='ident'>username</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>str</span>,
-    <span class='doccomment'>/// Real name.</span>
-    <span class='kw'>pub</span> <span class='ident'>realname</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>str</span>,
-    <span class='doccomment'>/// Reconnection settings. If None, reconnection is disabled.</span>
-    <span class='kw'>pub</span> <span class='ident'>reco_settings</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>ReconnectionSettings</span><span class='op'>&gt;</span>,
-    <span class='doccomment'>/// Monitor settings. If None, monitoring is disabled.</span>
-    <span class='kw'>pub</span> <span class='ident'>mon_settings</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>MonitorSettings</span><span class='op'>&gt;</span>,
 }
 
 <span class='doccomment'>/// Represents the state of this connection.</span>
@@ -895,17 +872,17 @@
 
 <span class='doccomment'>/// Create an irc client with the listener and settings.</span>
 <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>dispatch</span><span class='op'>&lt;</span><span class='ident'>L</span>: <span class='ident'>Listener</span><span class='op'>&gt;</span>(<span class='ident'>listener</span>: <span class='ident'>L</span>, <span class='ident'>settings</span>: <span class='ident'>Settings</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span>(), <span class='ident'>Error</span><span class='op'>&gt;</span> {
-    <span class='kw'>let</span> <span class='ident'>reco_settings</span> <span class='op'>=</span> <span class='ident'>settings</span>.<span class='ident'>reco_settings</span>.<span class='ident'>unwrap_or</span>(<span class='ident'>ReconnectionSettings</span>::<span class='ident'>DoNotReconnect</span>);
-    <span class='kw'>let</span> (<span class='ident'>writer</span>, <span class='ident'>reader</span>) <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>connect</span>(<span class='ident'>settings</span>.<span class='ident'>addr</span>, <span class='ident'>reco_settings</span>));
+    <span class='kw'>let</span> (<span class='ident'>writer</span>, <span class='ident'>reader</span>) <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>connect</span>(<span class='ident'>settings</span>.<span class='ident'>addr</span>, <span class='ident'>settings</span>.<span class='ident'>reconnection</span>));
 
     <span class='kw'>let</span> <span class='ident'>irc</span> <span class='op'>=</span> <span class='ident'>Irc</span>::<span class='ident'>new</span>(<span class='ident'>writer</span>.<span class='ident'>clone</span>());
     <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>irc</span>.<span class='ident'>nick</span>(<span class='ident'>settings</span>.<span class='ident'>nickname</span>));
     <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>irc</span>.<span class='ident'>user</span>(<span class='ident'>settings</span>.<span class='ident'>username</span>, <span class='ident'>settings</span>.<span class='ident'>realname</span>));
 
     <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>dispatch</span> <span class='op'>=</span> <span class='ident'>Dispatch</span> {
-        <span class='ident'>am</span>: <span class='ident'>settings</span>.<span class='ident'>mon_settings</span>.<span class='ident'>map</span>(<span class='op'>|</span><span class='ident'>s</span><span class='op'>|</span> <span class='ident'>ActivityMonitor</span>::<span class='ident'>new</span>(<span class='kw-2'>&amp;</span><span class='ident'>writer</span>, <span class='ident'>s</span>)),
+        <span class='ident'>am</span>: <span class='ident'>settings</span>.<span class='ident'>monitor</span>.<span class='ident'>map</span>(<span class='op'>|</span><span class='ident'>s</span><span class='op'>|</span> <span class='ident'>ActivityMonitor</span>::<span class='ident'>new</span>(<span class='kw-2'>&amp;</span><span class='ident'>writer</span>, <span class='ident'>s</span>)),
         <span class='ident'>listener</span>: <span class='ident'>Box</span>::<span class='ident'>new</span>(<span class='ident'>listener</span>),
         <span class='ident'>irc</span>: <span class='ident'>irc</span>,
+        <span class='ident'>settings</span>: <span class='ident'>settings</span>,
     };
 
     <span class='kw'>for</span> <span class='ident'>event</span> <span class='kw'>in</span> <span class='ident'>reader</span>.<span class='ident'>iter</span>() {
@@ -919,6 +896,7 @@
     <span class='ident'>am</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>ActivityMonitor</span><span class='op'>&gt;</span>,
     <span class='ident'>listener</span>: <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Listener</span> <span class='op'>+</span> <span class='lifetime'>&#39;a</span><span class='op'>&gt;</span>,
     <span class='ident'>irc</span>: <span class='ident'>Irc</span>,
+    <span class='ident'>settings</span>: <span class='ident'>Settings</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span>,
 }
 
 <span class='kw'>impl</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span> <span class='ident'>Dispatch</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span> {
@@ -947,6 +925,10 @@
             }
             <span class='ident'>Event</span>::<span class='ident'>Reconnected</span> <span class='op'>=&gt;</span> {
                 <span class='self'>self</span>.<span class='ident'>irc</span>.<span class='ident'>status</span> <span class='op'>=</span> <span class='ident'>ConnectionStatus</span>::<span class='ident'>Connected</span>;
+                <span class='kw'>if</span> <span class='self'>self</span>.<span class='ident'>settings</span>.<span class='ident'>auto_ident</span> {
+                    <span class='kw'>let</span> _ <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>irc</span>.<span class='ident'>user</span>(<span class='self'>self</span>.<span class='ident'>settings</span>.<span class='ident'>username</span>, <span class='self'>self</span>.<span class='ident'>settings</span>.<span class='ident'>realname</span>);
+                    <span class='kw'>let</span> _ <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>irc</span>.<span class='ident'>nick</span>(<span class='self'>self</span>.<span class='ident'>settings</span>.<span class='ident'>nickname</span>);
+                }
                 <span class='self'>self</span>.<span class='ident'>listener</span>.<span class='ident'>reconnect</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>irc</span>);
             }
             <span class='ident'>Event</span>::<span class='ident'>Message</span>(<span class='kw-2'>ref</span> <span class='ident'>msg</span>) <span class='op'>=&gt;</span> {
@@ -1144,7 +1126,9 @@
 
     <span class='kw'>fn</span> <span class='ident'>ping</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>msg</span>: <span class='kw-2'>&amp;</span><span class='ident'>Message</span>) {
         <span class='kw'>let</span> <span class='ident'>server</span> <span class='op'>=</span> <span class='macro'>some_or_return</span><span class='macro'>!</span>(<span class='ident'>msg</span>.<span class='ident'>args</span>.<span class='ident'>last</span>());
-        <span class='kw'>let</span> _ <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>irc</span>.<span class='ident'>pong</span>(<span class='ident'>server</span>);
+        <span class='kw'>if</span> <span class='self'>self</span>.<span class='ident'>settings</span>.<span class='ident'>auto_ping</span> {
+            <span class='kw'>let</span> _ <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>irc</span>.<span class='ident'>pong</span>(<span class='ident'>server</span>);
+        }
         <span class='self'>self</span>.<span class='ident'>listener</span>.<span class='ident'>ping</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>irc</span>, <span class='ident'>server</span>);
     }
 
