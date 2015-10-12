@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="rustdoc">
-    <meta name="description" content="Source to the Rust file `/home/simon/.multirust/toolchains/nightly/cargo/registry/src/github.com-0a35038f75765ae4/loirc-0.1.3/src/connection.rs`.">
+    <meta name="description" content="Source to the Rust file `/home/simon/.multirust/toolchains/nightly/cargo/registry/src/github.com-0a35038f75765ae4/loirc-0.1.4/src/connection.rs`.">
     <meta name="keywords" content="rust, rustlang, rust-lang">
 
     <title>connection.rs.html -- source</title>
@@ -409,6 +409,12 @@
 <span id="367">367</span>
 <span id="368">368</span>
 <span id="369">369</span>
+<span id="370">370</span>
+<span id="371">371</span>
+<span id="372">372</span>
+<span id="373">373</span>
+<span id="374">374</span>
+<span id="375">375</span>
 </pre><pre class='rust '>
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>io</span>::{<span class='self'>self</span>, <span class='ident'>BufRead</span>, <span class='ident'>BufReader</span>, <span class='ident'>Write</span>};
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>net</span>::{<span class='ident'>Shutdown</span>, <span class='ident'>TcpStream</span>};
@@ -416,6 +422,7 @@
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>sync</span>::<span class='ident'>mpsc</span>::{<span class='self'>self</span>, <span class='ident'>Sender</span>, <span class='ident'>Receiver</span>};
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>thread</span>;
 
+<span class='kw'>use</span> <span class='ident'>encoding</span>::{<span class='ident'>DecoderTrap</span>, <span class='ident'>EncodingRef</span>, <span class='ident'>EncoderTrap</span>};
 <span class='kw'>use</span> <span class='ident'>time</span>::<span class='ident'>Duration</span>;
 
 <span class='kw'>use</span> <span class='ident'>message</span>::{<span class='ident'>Message</span>, <span class='ident'>ParseError</span>};
@@ -483,13 +490,15 @@
 <span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Clone</span>)]</span>
 <span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>Writer</span> {
     <span class='ident'>stream</span>: <span class='ident'>Arc</span><span class='op'>&lt;</span><span class='ident'>Mutex</span><span class='op'>&lt;</span><span class='ident'>StreamStatus</span><span class='op'>&gt;&gt;</span>,
+    <span class='ident'>encoding</span>: <span class='ident'>EncodingRef</span>,
 }
 
 <span class='kw'>impl</span> <span class='ident'>Writer</span> {
 
-    <span class='kw'>fn</span> <span class='ident'>new</span>(<span class='ident'>stream</span>: <span class='ident'>TcpStream</span>) <span class='op'>-&gt;</span> <span class='ident'>Writer</span> {
+    <span class='kw'>fn</span> <span class='ident'>new</span>(<span class='ident'>stream</span>: <span class='ident'>TcpStream</span>, <span class='ident'>encoding</span>: <span class='ident'>EncodingRef</span>) <span class='op'>-&gt;</span> <span class='ident'>Writer</span> {
         <span class='ident'>Writer</span> {
-            <span class='ident'>stream</span>: <span class='ident'>Arc</span>::<span class='ident'>new</span>(<span class='ident'>Mutex</span>::<span class='ident'>new</span>(<span class='ident'>StreamStatus</span>::<span class='ident'>Connected</span>(<span class='ident'>stream</span>)))
+            <span class='ident'>stream</span>: <span class='ident'>Arc</span>::<span class='ident'>new</span>(<span class='ident'>Mutex</span>::<span class='ident'>new</span>(<span class='ident'>StreamStatus</span>::<span class='ident'>Connected</span>(<span class='ident'>stream</span>))),
+            <span class='ident'>encoding</span>: <span class='ident'>encoding</span>,
         }
     }
 
@@ -569,7 +578,8 @@
             }
             <span class='ident'>StreamStatus</span>::<span class='ident'>Connected</span>(<span class='kw-2'>ref</span> <span class='kw-2'>mut</span> <span class='ident'>stream</span>) <span class='op'>=&gt;</span> {
                 <span class='comment'>// Try to write to the stream.</span>
-                <span class='kw'>if</span> <span class='ident'>stream</span>.<span class='ident'>write</span>(<span class='ident'>data</span>.<span class='ident'>as_ref</span>().<span class='ident'>as_bytes</span>()).<span class='ident'>is_err</span>() {
+                <span class='kw'>let</span> <span class='ident'>bytes</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>encoding</span>.<span class='ident'>encode</span>(<span class='ident'>data</span>.<span class='ident'>as_ref</span>(), <span class='ident'>EncoderTrap</span>::<span class='ident'>Ignore</span>).<span class='ident'>unwrap</span>();
+                <span class='kw'>if</span> <span class='ident'>stream</span>.<span class='ident'>write</span>(<span class='kw-2'>&amp;</span><span class='ident'>bytes</span>).<span class='ident'>is_err</span>() {
                     <span class='comment'>// The write failed, shutdown the connection.</span>
                     <span class='kw'>let</span> _ <span class='op'>=</span> <span class='ident'>stream</span>.<span class='ident'>shutdown</span>(<span class='ident'>Shutdown</span>::<span class='ident'>Both</span>);
                     <span class='ident'>failed</span> <span class='op'>=</span> <span class='boolval'>true</span>;
@@ -661,10 +671,11 @@
 
 <span class='kw'>fn</span> <span class='ident'>reader_thread</span>(<span class='ident'>address</span>: <span class='ident'>String</span>, <span class='kw-2'>mut</span> <span class='ident'>reader</span>: <span class='ident'>BufReader</span><span class='op'>&lt;</span><span class='ident'>TcpStream</span><span class='op'>&gt;</span>,
                                    <span class='ident'>event_sender</span>: <span class='ident'>Sender</span><span class='op'>&lt;</span><span class='ident'>Event</span><span class='op'>&gt;</span>, <span class='ident'>handle</span>: <span class='ident'>Writer</span>,
-                                   <span class='ident'>reco_settings</span>: <span class='ident'>ReconnectionSettings</span>) {
+                                   <span class='ident'>reco_settings</span>: <span class='ident'>ReconnectionSettings</span>,
+                                   <span class='ident'>encoding</span>: <span class='ident'>EncodingRef</span>) {
     <span class='lifetime'>&#39;read</span>: <span class='kw'>loop</span> {
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>line</span> <span class='op'>=</span> <span class='ident'>String</span>::<span class='ident'>new</span>();
-        <span class='kw'>let</span> <span class='ident'>res</span> <span class='op'>=</span> <span class='ident'>reader</span>.<span class='ident'>read_line</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>line</span>);
+        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>buff</span> <span class='op'>=</span> <span class='ident'>Vec</span>::<span class='ident'>new</span>();
+        <span class='kw'>let</span> <span class='ident'>res</span> <span class='op'>=</span> <span class='ident'>reader</span>.<span class='ident'>read_until</span>(<span class='string'>b&#39;\n&#39;</span>, <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>buff</span>);
 
         <span class='comment'>// If there&#39;s an error or a zero length read, we should check to reconnect or exit.</span>
         <span class='comment'>// If the size is 0, it means that the socket was shutdown.</span>
@@ -741,6 +752,8 @@
                 }
             }
         } <span class='kw'>else</span> {
+            <span class='comment'>// decode the message</span>
+            <span class='kw'>let</span> <span class='ident'>line</span> <span class='op'>=</span> <span class='ident'>encoding</span>.<span class='ident'>decode</span>(<span class='kw-2'>&amp;</span><span class='ident'>buff</span>, <span class='ident'>DecoderTrap</span>::<span class='ident'>Ignore</span>).<span class='ident'>unwrap</span>();
             <span class='comment'>// Size is bigger than 0, try to parse the message. Send the result in the channel.</span>
             <span class='kw'>if</span> <span class='ident'>event_sender</span>.<span class='ident'>send</span>(<span class='ident'>Message</span>::<span class='ident'>parse</span>(<span class='kw-2'>&amp;</span><span class='ident'>line</span>).<span class='ident'>into</span>()).<span class='ident'>is_err</span>() {
                 <span class='kw'>break</span>;
@@ -761,20 +774,19 @@
 <span class='doccomment'>/// an error is returned.</span>
 <span class='doccomment'>///</span>
 <span class='doccomment'>/// If you don&#39;t want to reconnect, use `ReconnectionSettings::DoNotReconnect`.</span>
-<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>connect</span><span class='op'>&lt;</span><span class='ident'>A</span>: <span class='ident'>AsRef</span><span class='op'>&lt;</span><span class='ident'>str</span><span class='op'>&gt;&gt;</span>(<span class='ident'>address</span>: <span class='ident'>A</span>, <span class='ident'>reco_settings</span>: <span class='ident'>ReconnectionSettings</span>) <span class='op'>-&gt;</span> <span class='ident'>io</span>::<span class='prelude-ty'>Result</span><span class='op'>&lt;</span>(<span class='ident'>Writer</span>, <span class='ident'>Reader</span>)<span class='op'>&gt;</span> {
-
+<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>connect</span><span class='op'>&lt;</span><span class='ident'>A</span>: <span class='ident'>AsRef</span><span class='op'>&lt;</span><span class='ident'>str</span><span class='op'>&gt;&gt;</span>(<span class='ident'>address</span>: <span class='ident'>A</span>, <span class='ident'>reco_settings</span>: <span class='ident'>ReconnectionSettings</span>, <span class='ident'>encoding</span>: <span class='ident'>EncodingRef</span>) <span class='op'>-&gt;</span> <span class='ident'>io</span>::<span class='prelude-ty'>Result</span><span class='op'>&lt;</span>(<span class='ident'>Writer</span>, <span class='ident'>Reader</span>)<span class='op'>&gt;</span> {
     <span class='kw'>let</span> <span class='ident'>stream</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>TcpStream</span>::<span class='ident'>connect</span>(<span class='ident'>address</span>.<span class='ident'>as_ref</span>()));
     <span class='kw'>let</span> <span class='ident'>reader</span> <span class='op'>=</span> <span class='ident'>BufReader</span>::<span class='ident'>new</span>(<span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>stream</span>.<span class='ident'>try_clone</span>()));
 
     <span class='kw'>let</span> (<span class='ident'>event_sender</span>, <span class='ident'>event_reader</span>) <span class='op'>=</span> <span class='ident'>mpsc</span>::<span class='ident'>channel</span>::<span class='op'>&lt;</span><span class='ident'>Event</span><span class='op'>&gt;</span>();
 
-    <span class='kw'>let</span> <span class='ident'>writer</span> <span class='op'>=</span> <span class='ident'>Writer</span>::<span class='ident'>new</span>(<span class='ident'>stream</span>);
+    <span class='kw'>let</span> <span class='ident'>writer</span> <span class='op'>=</span> <span class='ident'>Writer</span>::<span class='ident'>new</span>(<span class='ident'>stream</span>, <span class='ident'>encoding</span>);
     <span class='comment'>// The reader thread needs a handle to modify the status.</span>
     <span class='kw'>let</span> <span class='ident'>reader_handle</span> <span class='op'>=</span> <span class='ident'>writer</span>.<span class='ident'>clone</span>();
 
-    <span class='kw'>let</span> <span class='ident'>address_clone</span> <span class='op'>=</span> <span class='ident'>address</span>.<span class='ident'>as_ref</span>().<span class='ident'>to_owned</span>();
+    <span class='kw'>let</span> <span class='ident'>address_clone</span> <span class='op'>=</span> <span class='ident'>address</span>.<span class='ident'>as_ref</span>().<span class='ident'>into</span>();
     <span class='ident'>thread</span>::<span class='ident'>spawn</span>(<span class='kw'>move</span> <span class='op'>||</span> {
-        <span class='ident'>reader_thread</span>(<span class='ident'>address_clone</span>, <span class='ident'>reader</span>, <span class='ident'>event_sender</span>, <span class='ident'>reader_handle</span>, <span class='ident'>reco_settings</span>);
+        <span class='ident'>reader_thread</span>(<span class='ident'>address_clone</span>, <span class='ident'>reader</span>, <span class='ident'>event_sender</span>, <span class='ident'>reader_handle</span>, <span class='ident'>reco_settings</span>, <span class='ident'>encoding</span>);
     });
 
     <span class='prelude-val'>Ok</span>((<span class='ident'>writer</span>, <span class='ident'>event_reader</span>))

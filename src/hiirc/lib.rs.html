@@ -64,6 +64,7 @@
 <span id="22">22</span>
 <span id="23">23</span>
 <span id="24">24</span>
+<span id="25">25</span>
 </pre><pre class='rust '>
 <span class='attribute'>#<span class='op'>!</span>[<span class='ident'>deny</span>(<span class='ident'>missing_docs</span>)]</span>
 <span class='doccomment'>//! `hiirc` is a library built on top of [loirc](https://github.com/SBSTP/loirc). The goal</span>
@@ -73,6 +74,7 @@
 <span class='doccomment'>//! to the dispatch function, accompanied with an instance of the Settings struct configured to</span>
 <span class='doccomment'>//! your needs.</span>
 
+<span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>encoding</span>;
 <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>loirc</span>;
 
 <span class='attribute'>#[<span class='ident'>macro_use</span>]</span>
@@ -87,7 +89,7 @@
 <span class='kw'>pub</span> <span class='kw'>use</span> <span class='ident'>listener</span>::<span class='ident'>Listener</span>;
 <span class='kw'>pub</span> <span class='kw'>use</span> <span class='ident'>settings</span>::<span class='ident'>Settings</span>;
 <span class='kw'>pub</span> <span class='kw'>use</span> <span class='ident'>loirc</span>::<span class='ident'>Error</span> <span class='kw'>as</span> <span class='ident'>LoircError</span>;
-<span class='kw'>pub</span> <span class='kw'>use</span> <span class='ident'>loirc</span>::{<span class='ident'>Code</span>, <span class='ident'>Duration</span>, <span class='ident'>Event</span>, <span class='ident'>Message</span>, <span class='ident'>MonitorSettings</span>, <span class='ident'>ParseError</span>, <span class='ident'>Prefix</span>, <span class='ident'>PrefixUser</span>,
+<span class='kw'>pub</span> <span class='kw'>use</span> <span class='ident'>loirc</span>::{<span class='ident'>Code</span>, <span class='ident'>Event</span>, <span class='ident'>Message</span>, <span class='ident'>MonitorSettings</span>, <span class='ident'>ParseError</span>, <span class='ident'>Prefix</span>, <span class='ident'>PrefixUser</span>,
                 <span class='ident'>ReconnectionSettings</span>};
 </pre>
 </section>

@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="rustdoc">
-    <meta name="description" content="Source to the Rust file `/home/simon/.multirust/toolchains/nightly/cargo/registry/src/github.com-0a35038f75765ae4/loirc-0.1.3/src/lib.rs`.">
+    <meta name="description" content="Source to the Rust file `/home/simon/.multirust/toolchains/nightly/cargo/registry/src/github.com-0a35038f75765ae4/loirc-0.1.4/src/lib.rs`.">
     <meta name="keywords" content="rust, rustlang, rust-lang">
 
     <title>lib.rs.html -- source</title>
@@ -84,6 +84,10 @@
 <span id="42">42</span>
 <span id="43">43</span>
 <span id="44">44</span>
+<span id="45">45</span>
+<span id="46">46</span>
+<span id="47">47</span>
+<span id="48">48</span>
 </pre><pre class='rust '>
 <span class='doccomment'>//! This library&#39;s goal is to offer a highly available IRC client with an easy to use API.</span>
 <span class='doccomment'>//! Automatic reconnection is built into the design. It uses a channel-like design, where</span>
@@ -94,36 +98,40 @@
 <span class='doccomment'>//! Here&#39;s a canonical example.</span>
 <span class='doccomment'>//!</span>
 <span class='doccomment'>//! ```no_run</span>
+<span class='doccomment'>//! extern crate encoding;</span>
+<span class='doccomment'>//! extern crate loirc;</span>
+<span class='doccomment'>//!</span>
+<span class='doccomment'>//! use encoding::all::UTF_8;</span>
 <span class='doccomment'>//! use loirc::{connect, Code, Event};</span>
 <span class='doccomment'>//!</span>
-<span class='doccomment'>//! // connect to freenode and use the default reconnection settings.</span>
-<span class='doccomment'>//! let (writer, reader) = connect(&quot;irc.freenode.net:6667&quot;, Default::default()).unwrap();</span>
-<span class='doccomment'>//! writer.raw(format!(&quot;USER {} 8 * :{}\n&quot;, &quot;username&quot;, &quot;realname&quot;));</span>
-<span class='doccomment'>//! writer.raw(format!(&quot;NICK {}\n&quot;, &quot;nickname&quot;));</span>
-<span class='doccomment'>//! // Block until something happens.</span>
-<span class='doccomment'>//! for event in reader.iter() {</span>
-<span class='doccomment'>//!     match event {</span>
-<span class='doccomment'>//!         // Handle messages</span>
-<span class='doccomment'>//!        Event::Message(msg) =&gt; {</span>
-<span class='doccomment'>//!             if msg.code == Code::RplWelcome {</span>
-<span class='doccomment'>//!                 writer.raw(format!(&quot;JOIN {}\n&quot;, &quot;#channel&quot;));</span>
+<span class='doccomment'>//! fn main() {</span>
+<span class='doccomment'>//!     // connect to freenode and use the default reconnection settings.</span>
+<span class='doccomment'>//!     let (writer, reader) = connect(&quot;irc.freenode.net:6667&quot;, Default::default(), UTF_8).unwrap();</span>
+<span class='doccomment'>//!     writer.raw(format!(&quot;USER {} 8 * :{}\n&quot;, &quot;username&quot;, &quot;realname&quot;));</span>
+<span class='doccomment'>//!     writer.raw(format!(&quot;NICK {}\n&quot;, &quot;nickname&quot;));</span>
+<span class='doccomment'>//!     // Block until something happens.</span>
+<span class='doccomment'>//!     for event in reader.iter() {</span>
+<span class='doccomment'>//!         match event {</span>
+<span class='doccomment'>//!             // Handle messages</span>
+<span class='doccomment'>//!             Event::Message(msg) =&gt; {</span>
+<span class='doccomment'>//!                 if msg.code == Code::RplWelcome {</span>
+<span class='doccomment'>//!                     writer.raw(format!(&quot;JOIN {}\n&quot;, &quot;#channel&quot;));</span>
+<span class='doccomment'>//!                 }</span>
 <span class='doccomment'>//!             }</span>
+<span class='doccomment'>//!             // Handle other events, such as disconnects.</span>
+<span class='doccomment'>//!             _ =&gt; {}</span>
 <span class='doccomment'>//!         }</span>
-<span class='doccomment'>//!         // Handle other events, such as disconnects.</span>
-<span class='doccomment'>//!         _ =&gt; {}</span>
 <span class='doccomment'>//!     }</span>
 <span class='doccomment'>//! }</span>
 <span class='doccomment'>//! ```</span>
 <span class='attribute'>#<span class='op'>!</span>[<span class='ident'>deny</span>(<span class='ident'>missing_docs</span>)]</span>
-
+<span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>encoding</span>;
 <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>time</span>;
 
 <span class='kw'>mod</span> <span class='ident'>activity_monitor</span>;
 <span class='kw'>mod</span> <span class='ident'>code</span>;
 <span class='kw'>mod</span> <span class='ident'>connection</span>;
 <span class='kw'>mod</span> <span class='ident'>message</span>;
-
-<span class='kw'>pub</span> <span class='kw'>use</span> <span class='ident'>time</span>::<span class='ident'>Duration</span>;
 
 <span class='kw'>pub</span> <span class='kw'>use</span> <span class='ident'>activity_monitor</span>::{<span class='ident'>ActivityMonitor</span>, <span class='ident'>MonitorSettings</span>};
 <span class='kw'>pub</span> <span class='kw'>use</span> <span class='ident'>connection</span>::{<span class='ident'>connect</span>, <span class='ident'>Event</span>, <span class='ident'>Error</span>, <span class='ident'>Reader</span>, <span class='ident'>ReconnectionSettings</span>, <span class='ident'>Writer</span>};
