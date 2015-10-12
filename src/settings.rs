@@ -26,7 +26,19 @@ pub struct Settings<'a> {
 
 impl<'a> Settings<'a> {
 
-    /// Create new settings with sensible defaults.
+    /// Create new settings with sensible default values.
+    ///
+    /// The default values are:
+    ///
+    /// ```
+    /// username: "hiirc",
+    /// realname: "hiirc",
+    /// reconnection: ReonnectionSettings::DoNotReconnect,
+    /// monitor: None,
+    /// auto_ident: true,
+    /// auto_ping: true,
+    /// encoding: UTF_8,
+    /// ```
     pub fn new<'b>(addr: &'b str, nickname: &'b str) -> Settings<'b> {
         Settings {
             addr: addr,
