@@ -77,7 +77,17 @@
 </div></td></tr><tr class='stab '>
                                   <td id='structfield.encoding'><code>encoding</code></td><td><div class='docblock'><p>Encoding used for the connection.</p>
 </div></td></tr></table><h2 id='methods'>Methods</h2><h3 class='impl'><code>impl&lt;'a&gt; <a class='struct' href='../hiirc/struct.Settings.html' title='hiirc::Settings'>Settings</a>&lt;'a&gt;</code></h3><div class='impl-items'><h4 id='method.new' class='method'><code>fn <a href='#method.new' class='fnname'>new</a>&lt;'b&gt;(addr: &amp;'b <a href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>, nickname: &amp;'b <a href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>) -&gt; <a class='struct' href='../hiirc/struct.Settings.html' title='hiirc::Settings'>Settings</a>&lt;'b&gt;</code></h4>
-<div class='docblock'><p>Create new settings with sensible defaults.</p>
+<div class='docblock'><p>Create new settings with sensible default values.</p>
+
+<p>The default values are:</p>
+<pre class='rust rust-example-rendered'>
+<span class='ident'>username</span>: <span class='string'>&quot;hiirc&quot;</span>,
+<span class='ident'>realname</span>: <span class='string'>&quot;hiirc&quot;</span>,
+<span class='ident'>reconnection</span>: <span class='ident'>ReonnectionSettings</span>::<span class='ident'>DoNotReconnect</span>,
+<span class='ident'>monitor</span>: <span class='prelude-val'>None</span>,
+<span class='ident'>auto_ident</span>: <span class='boolval'>true</span>,
+<span class='ident'>auto_ping</span>: <span class='boolval'>true</span>,
+<span class='ident'>encoding</span>: <span class='ident'>UTF_8</span>,</pre>
 </div></div></section>
     <section id='search' class="content hidden"></section>
 

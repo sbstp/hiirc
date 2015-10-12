@@ -84,6 +84,18 @@
 <span id="42">42</span>
 <span id="43">43</span>
 <span id="44">44</span>
+<span id="45">45</span>
+<span id="46">46</span>
+<span id="47">47</span>
+<span id="48">48</span>
+<span id="49">49</span>
+<span id="50">50</span>
+<span id="51">51</span>
+<span id="52">52</span>
+<span id="53">53</span>
+<span id="54">54</span>
+<span id="55">55</span>
+<span id="56">56</span>
 </pre><pre class='rust '>
 <span class='kw'>use</span> <span class='ident'>encoding</span>::<span class='ident'>EncodingRef</span>;
 <span class='kw'>use</span> <span class='ident'>encoding</span>::<span class='ident'>all</span>::<span class='ident'>UTF_8</span>;
@@ -113,7 +125,19 @@
 
 <span class='kw'>impl</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span> <span class='ident'>Settings</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span> {
 
-    <span class='doccomment'>/// Create new settings with sensible defaults.</span>
+    <span class='doccomment'>/// Create new settings with sensible default values.</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// The default values are:</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// ```</span>
+    <span class='doccomment'>/// username: &quot;hiirc&quot;,</span>
+    <span class='doccomment'>/// realname: &quot;hiirc&quot;,</span>
+    <span class='doccomment'>/// reconnection: ReonnectionSettings::DoNotReconnect,</span>
+    <span class='doccomment'>/// monitor: None,</span>
+    <span class='doccomment'>/// auto_ident: true,</span>
+    <span class='doccomment'>/// auto_ping: true,</span>
+    <span class='doccomment'>/// encoding: UTF_8,</span>
+    <span class='doccomment'>/// ```</span>
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>new</span><span class='op'>&lt;</span><span class='lifetime'>&#39;b</span><span class='op'>&gt;</span>(<span class='ident'>addr</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;b</span> <span class='ident'>str</span>, <span class='ident'>nickname</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;b</span> <span class='ident'>str</span>) <span class='op'>-&gt;</span> <span class='ident'>Settings</span><span class='op'>&lt;</span><span class='lifetime'>&#39;b</span><span class='op'>&gt;</span> {
         <span class='ident'>Settings</span> {
             <span class='ident'>addr</span>: <span class='ident'>addr</span>,
