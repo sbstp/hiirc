@@ -1,5 +1,7 @@
 #![allow(unused_must_use)]
+
 extern crate hiirc;
+
 use std::env;
 use hiirc::*;
 

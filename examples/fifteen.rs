@@ -10,8 +10,10 @@
 #![allow(unused_must_use)]
 
 extern crate hiirc;
+extern crate time;
 
 use hiirc::*;
+use time::Duration;
 
 struct Fifteen {
     reply_to_ping: bool,

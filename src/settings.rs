@@ -1,3 +1,5 @@
+use encoding::EncodingRef;
+use encoding::all::UTF_8;
 use loirc::{MonitorSettings, ReconnectionSettings};
 
 /// Settings for the dispatcher.
@@ -18,6 +20,8 @@ pub struct Settings<'a> {
     pub auto_ident: bool,
     /// Automatically reply to ping requests.
     pub auto_ping: bool,
+    /// Encoding used for the connection.
+    pub encoding: EncodingRef,
 }
 
 impl<'a> Settings<'a> {
@@ -33,6 +37,7 @@ impl<'a> Settings<'a> {
             monitor: None,
             auto_ident: true,
             auto_ping: true,
+            encoding: UTF_8,
         }
     }
 

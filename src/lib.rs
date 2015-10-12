@@ -6,6 +6,7 @@
 //! to the dispatch function, accompanied with an instance of the Settings struct configured to
 //! your needs.
 
+extern crate encoding;
 extern crate loirc;
 
 #[macro_use]
@@ -20,5 +21,5 @@ pub use core::{Channel, ConnectionStatus, Error, Irc, ChannelUser, ChannelUserSt
 pub use listener::Listener;
 pub use settings::Settings;
 pub use loirc::Error as LoircError;
-pub use loirc::{Code, Duration, Event, Message, MonitorSettings, ParseError, Prefix, PrefixUser,
+pub use loirc::{Code, Event, Message, MonitorSettings, ParseError, Prefix, PrefixUser,
                 ReconnectionSettings};

@@ -270,7 +270,7 @@ impl Irc {
 
 /// Create an irc client with the listener and settings.
 pub fn dispatch<L: Listener>(listener: L, settings: Settings) -> Result<(), Error> {
-    let (writer, reader) = try!(connect(settings.addr, settings.reconnection));
+    let (writer, reader) = try!(connect(settings.addr, settings.reconnection, settings.encoding));
 
     let irc = Irc::new(writer.clone());
     try!(irc.nick(settings.nickname));
