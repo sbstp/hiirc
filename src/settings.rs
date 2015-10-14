@@ -30,7 +30,7 @@ impl<'a> Settings<'a> {
     ///
     /// The default values are:
     ///
-    /// ```
+    /// ```ignore
     /// username: "hiirc",
     /// realname: "hiirc",
     /// reconnection: ReonnectionSettings::DoNotReconnect,
