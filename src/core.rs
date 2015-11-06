@@ -16,6 +16,8 @@ pub enum ChannelUserStatus {
     Voice,
     /// User has operator status.
     Operator,
+    /// User has owner status.
+    Owner,
 }
 
 /// Represents a user inside of a channel.
@@ -31,6 +33,7 @@ impl ChannelUser {
 
     fn from_raw(raw: &str) -> ChannelUser {
         let status = match raw.chars().next() {
+            Some('&') => ChannelUserStatus::Owner,
             Some('@') => ChannelUserStatus::Operator,
             Some('+') => ChannelUserStatus::Voice,
             _ => ChannelUserStatus::Normal,
@@ -556,4 +559,11 @@ fn test_user_from_raw_op() {
     let user = ChannelUser::from_raw("@test");
     assert_eq!(&user.nickname, "test");
     assert_eq!(user.status, ChannelUserStatus::Operator);
+}
+
+#[test]
+fn test_user_from_raw_owner() {
+    let user = ChannelUser::from_raw("&test");
+    assert_eq!(&user.nickname, "test");
+    assert_eq!(user.status, ChannelUserStatus::Owner);
 }
