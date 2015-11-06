@@ -269,6 +269,11 @@ impl Irc {
         self.raw(format!("TOPIC {} :{}", channel, topic))
     }
 
+    /// KICK command.
+    pub fn kick(&self, channel: &str, nickname: &str) -> Result<(), Error> {
+        self.raw(format!("KICK {} {}", channel, nickname))
+    }
+
 }
 
 /// Create an irc client with the listener and settings.
