@@ -152,10 +152,15 @@
 <span id="110">110</span>
 <span id="111">111</span>
 <span id="112">112</span>
+<span id="113">113</span>
+<span id="114">114</span>
+<span id="115">115</span>
+<span id="116">116</span>
+<span id="117">117</span>
 </pre><pre class='rust '>
 <span class='kw'>use</span> <span class='ident'>loirc</span>::<span class='ident'>Event</span>;
 
-<span class='kw'>use</span> {<span class='ident'>Channel</span>, <span class='ident'>ChannelUser</span>, <span class='ident'>Code</span>, <span class='ident'>Irc</span>, <span class='ident'>Message</span>};
+<span class='kw'>use</span> {<span class='ident'>Channel</span>, <span class='ident'>ChannelUser</span>, <span class='ident'>ChannelUserStatus</span>, <span class='ident'>Code</span>, <span class='ident'>Irc</span>, <span class='ident'>Message</span>};
 
 <span class='doccomment'>/// Implement this trait to handle events.</span>
 <span class='kw'>pub</span> <span class='kw'>trait</span> <span class='ident'>Listener</span> {
@@ -264,6 +269,11 @@
     <span class='doccomment'>/// When the server sends a pong message.</span>
     <span class='attribute'>#[<span class='ident'>allow</span>(<span class='ident'>unused_variables</span>)]</span>
     <span class='kw'>fn</span> <span class='ident'>pong</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>irc</span>: <span class='kw-2'>&amp;</span><span class='ident'>Irc</span>, <span class='ident'>server</span>: <span class='kw-2'>&amp;</span><span class='ident'>str</span>) {}
+
+    <span class='doccomment'>/// When the mode of a user in a channel changes.</span>
+    <span class='attribute'>#[<span class='ident'>allow</span>(<span class='ident'>unused_variables</span>)]</span>
+    <span class='kw'>fn</span> <span class='ident'>user_mode_change</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>irc</span>: <span class='kw-2'>&amp;</span><span class='ident'>Irc</span>, <span class='ident'>channel</span>: <span class='kw-2'>&amp;</span><span class='ident'>Channel</span>, <span class='ident'>user</span>: <span class='kw-2'>&amp;</span><span class='ident'>ChannelUser</span>,
+                        <span class='ident'>old_status</span>: <span class='ident'>ChannelUserStatus</span>, <span class='ident'>new_status</span>: <span class='ident'>ChannelUserStatus</span>) {}
 }
 </pre>
 </section>
