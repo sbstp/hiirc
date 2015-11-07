@@ -151,8 +151,8 @@ impl Irc {
         self.get_channel_by_id(&name.to_lowercase())
     }
 
-    /// Get a channel by id.
-    pub fn get_channel_by_id(&self, id: &str) -> Option<&Channel> {
+    /// Get a reference to a channel by id.
+    fn get_channel_by_id(&self, id: &str) -> Option<&Channel> {
         self.channels.get(id)
     }
 
