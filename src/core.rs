@@ -65,6 +65,14 @@ impl Channel {
         }
     }
 
+    /// Get a mutable reference to a user by nickname.
+    fn get_user_mut(&mut self, nickname: &str) -> Option<&mut ChannelUser> {
+        match self.users.iter_mut().position(|u| u.nickname == nickname) {
+            Some(idx) => Some(&mut self.users[idx]),
+            None => None,
+        }
+    }
+
     /// Get an iterator that iterates over the channel's users.
     pub fn users(&self) -> Iter<ChannelUser> {
         self.users.iter()
@@ -177,6 +185,39 @@ impl Irc {
         if let Some(channel) = self.channels.get_mut(channel_id) {
             if let Some(pos) = channel.users.iter().position(|u| u.nickname == nickname) {
                 return Some(channel.users.remove(pos));
+            }
+        }
+        None
+    }
+
+    fn channel_update_user_mode(&mut self, channel_id: &str, nickname: &str, mode: &str) -> Option<(ChannelUserStatus, ChannelUserStatus)> {
+        if let Some(channel) = self.channels.get_mut(channel_id) {
+            if let Some(user) = channel.get_user_mut(nickname) {
+                let old_status = user.status;
+
+                match user.status {
+                    ChannelUserStatus::Normal => {
+                        match &mode[..] {
+                            "+v" => user.status = ChannelUserStatus::Voice,
+                            "+o" => user.status = ChannelUserStatus::Operator,
+                            _ => (),
+                        }
+                    }
+                    ChannelUserStatus::Voice => {
+                        match &mode[..] {
+                            "-v" => user.status = ChannelUserStatus::Normal,
+                            _ => (),
+                        }
+                    }
+                    ChannelUserStatus::Operator | ChannelUserStatus::Owner => {
+                        match &mode[..] {
+                            "-o" => user.status = ChannelUserStatus::Normal,
+                            _ => (),
+                        }
+                    }
+                }
+
+                return Some((old_status, user.status));
             }
         }
         None
@@ -388,6 +429,9 @@ impl<'a> Dispatch<'a> {
                     Code::Pong => {
                         self.pong(msg);
                     }
+                    Code::Mode => {
+                        self.mode(msg);
+                    }
                     _ => {}
                 }
             }
@@ -541,6 +585,21 @@ impl<'a> Dispatch<'a> {
     fn pong(&mut self, msg: &Message) {
         let server = some_or_return!(msg.args.last());
         self.listener.pong(&self.irc, server);
+    }
+
+    fn mode(&mut self, msg: &Message) {
+        let mode = some_or_return!(msg.args.get(1));
+        let nickname = some_or_return!(msg.args.get(2));
+        let channel_name = some_or_return!(msg.args.get(0));
+        let channel_id = channel_name.to_lowercase();
+
+        if let Some((old_status, new_status)) = self.irc.channel_update_user_mode(&channel_id, nickname, mode) {
+            if old_status != new_status {
+                let channel = some_or_return!(self.irc.get_channel_by_id(&channel_id));
+                let user = some_or_return!(channel.get_user(nickname));
+                self.listener.user_mode_change(&self.irc, &channel, &user, old_status, user.status)
+            }
+        }
     }
 
 }

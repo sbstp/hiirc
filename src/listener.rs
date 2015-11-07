@@ -1,6 +1,6 @@
 use loirc::Event;
 
-use {Channel, ChannelUser, Code, Irc, Message};
+use {Channel, ChannelUser, ChannelUserStatus, Code, Irc, Message};
 
 /// Implement this trait to handle events.
 pub trait Listener {
@@ -109,4 +109,9 @@ pub trait Listener {
     /// When the server sends a pong message.
     #[allow(unused_variables)]
     fn pong(&mut self, irc: &Irc, server: &str) {}
+
+    /// When the mode of a user in a channel changes.
+    #[allow(unused_variables)]
+    fn user_mode_change(&mut self, irc: &Irc, channel: &Channel, user: &ChannelUser,
+                        old_status: ChannelUserStatus, new_status: ChannelUserStatus) {}
 }
