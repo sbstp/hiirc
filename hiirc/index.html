@@ -45,13 +45,14 @@
             <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                 [<span class='inner'>&#x2212;</span>]
             </a>
-        </span><a id='src-0' class='srclink' href='../src/hiirc/lib.rs.html#1-25' title='goto source code'>[src]</a></span></h1>
+        </span><a id='src-0' class='srclink' href='../src/hiirc/lib.rs.html#1-26' title='goto source code'>[src]</a></span></h1>
 <div class='docblock'><p><code>hiirc</code> is a library built on top of <a href="https://github.com/SBSTP/loirc">loirc</a>. The goal
 is to offer a friendly, event-based API.</p>
 
-<p>To use the library, implement the listener trait and give an instance of your implementation
-to the dispatch function, accompanied with an instance of the Settings struct configured to
-your needs.</p>
+<p>To use the library, implement the <code>Listener</code> trait and give an instance of your implementation
+to the dispatch function, accompanied with an instance of the <code>Settings</code> struct configured to
+your needs. You can also use the <code>Settings</code> struct as a builder, calling the <code>dispatch</code> method
+once it is configured to your needs.</p>
 </div><h2 id='modules' class='section-header'><a href="#modules">Modules</a></h2>
 <table>
                     <tr class=' module-item'>

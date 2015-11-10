@@ -65,14 +65,16 @@
 <span id="23">23</span>
 <span id="24">24</span>
 <span id="25">25</span>
+<span id="26">26</span>
 </pre><pre class='rust '>
 <span class='attribute'>#<span class='op'>!</span>[<span class='ident'>deny</span>(<span class='ident'>missing_docs</span>)]</span>
 <span class='doccomment'>//! `hiirc` is a library built on top of [loirc](https://github.com/SBSTP/loirc). The goal</span>
 <span class='doccomment'>//! is to offer a friendly, event-based API.</span>
 <span class='doccomment'>//!</span>
-<span class='doccomment'>//! To use the library, implement the listener trait and give an instance of your implementation</span>
-<span class='doccomment'>//! to the dispatch function, accompanied with an instance of the Settings struct configured to</span>
-<span class='doccomment'>//! your needs.</span>
+<span class='doccomment'>//! To use the library, implement the `Listener` trait and give an instance of your implementation</span>
+<span class='doccomment'>//! to the dispatch function, accompanied with an instance of the `Settings` struct configured to</span>
+<span class='doccomment'>//! your needs. You can also use the `Settings` struct as a builder, calling the `dispatch` method</span>
+<span class='doccomment'>//! once it is configured to your needs.</span>
 
 <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>encoding</span>;
 <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>loirc</span>;
