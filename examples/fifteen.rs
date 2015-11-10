@@ -52,6 +52,18 @@ impl Listener for Fifteen {
 }
 
 fn main() {
+    Settings::new("irc.freenode.net:6667", NICKNAME)
+        .username(USERNAME)
+        .realname(REALNAME)
+        .reconnection(ReconnectionSettings::Reconnect {
+            max_attempts: 0,
+            delay_between_attempts: Duration::seconds(5),
+            delay_after_disconnect: Duration::seconds(15),
+        })
+        .auto_ping(false)
+        .dispatch(Fifteen{ reply_to_ping: true }).unwrap();
+
+    /* This code is equivalent to the builder API shown above.
     let mut settings = Settings::new("irc.freenode.net:6667", NICKNAME);
     settings.username = USERNAME;
     settings.realname = REALNAME;
@@ -63,4 +75,5 @@ fn main() {
     settings.auto_ping = false;
 
     dispatch(Fifteen{ reply_to_ping: true }, settings).unwrap();
+    */
 }

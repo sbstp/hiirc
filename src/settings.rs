@@ -1,6 +1,8 @@
 use encoding::EncodingRef;
 use encoding::all::UTF_8;
 use loirc::{MonitorSettings, ReconnectionSettings};
+use ::core::{dispatch, Error};
+use ::listener::Listener;
 
 /// Settings for the dispatcher.
 pub struct Settings<'a> {
@@ -51,6 +53,55 @@ impl<'a> Settings<'a> {
             auto_ping: true,
             encoding: UTF_8,
         }
+    }
+
+    /// Modify the username.
+    pub fn username(mut self, username: &'a str) -> Settings<'a> {
+        self.username = username;
+        self
+    }
+
+    /// Modify the realname.
+    pub fn realname(mut self, realname: &'a str) -> Settings<'a> {
+        self.realname = realname;
+        self
+    }
+
+    /// Modify the reconnection settings.
+    pub fn reconnection(mut self, reconnection: ReconnectionSettings) -> Settings<'a> {
+        self.reconnection = reconnection;
+        self
+    }
+
+    /// Modify the monitor settings.
+    pub fn monitor(mut self, monitor: Option<MonitorSettings>) -> Settings<'a> {
+        self.monitor = monitor;
+        self
+    }
+
+    /// Enable/disable automatic indentification.
+    pub fn auto_ident(mut self, auto_ident: bool) -> Settings<'a> {
+        self.auto_ident = auto_ident;
+        self
+    }
+
+    /// Enable/disable automatic ping replies.
+    pub fn auto_ping(mut self, auto_ping: bool) -> Settings<'a> {
+        self.auto_ping = auto_ping;
+        self
+    }
+
+    /// Modify the encoding used for this connection.
+    pub fn encoding(mut self, encoding: EncodingRef) -> Settings<'a> {
+        self.encoding = encoding;
+        self
+    }
+
+    /// Connect to the server and begin dispatching events using the given `Listener`.
+    pub fn dispatch<L>(self, listener: L) -> Result<(), Error>
+        where L: Listener
+    {
+        dispatch(listener, self)
     }
 
 }

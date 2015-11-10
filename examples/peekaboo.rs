@@ -44,9 +44,16 @@ fn main() {
     let args: Vec<String> = env::args().collect();
     let channel = args.get(1).expect("Channel must be given as an argument.");
 
+    Settings::new("irc.freenode.net:6667", "peekaboo")
+        .username("peekaboo")
+        .realname("peekaboo")
+        .dispatch(Peekaboo::new(channel)).unwrap();
+
+    /* This code is equivalent to the builder API shown above.
     let mut settings = Settings::new("irc.freenode.net:6667", "peekaboo");
     settings.username = "peekaboo";
     settings.realname = "peekaboo";
 
     dispatch(Peekaboo::new(channel), settings).unwrap();
+    */
 }
