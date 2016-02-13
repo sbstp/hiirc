@@ -24,6 +24,8 @@ pub struct Settings<'a> {
     pub auto_ping: bool,
     /// Encoding used for the connection.
     pub encoding: EncodingRef,
+    /// Server password
+    pub password: &'a str,
 }
 
 impl<'a> Settings<'a> {
@@ -52,6 +54,7 @@ impl<'a> Settings<'a> {
             auto_ident: true,
             auto_ping: true,
             encoding: UTF_8,
+            password: "",
         }
     }
 
@@ -94,6 +97,12 @@ impl<'a> Settings<'a> {
     /// Modify the encoding used for this connection.
     pub fn encoding(mut self, encoding: EncodingRef) -> Settings<'a> {
         self.encoding = encoding;
+        self
+    }
+
+    /// Modify the server password.
+    pub fn password(mut self, password: &'a str) -> Settings<'a> {
+        self.password = password;
         self
     }
 

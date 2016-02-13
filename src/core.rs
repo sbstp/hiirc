@@ -266,6 +266,11 @@ impl Irc {
         self.raw(format!("PONG {}", server))
     }
 
+    /// PASS command.
+    pub fn pass(&self, password: &str) -> Result<(), Error> {
+        self.raw(format!("PASS {}", password))
+    }
+
     /// PRIVMSG command.
     pub fn privmsg(&self, target: &str, text: &str) -> Result<(), Error> {
         self.raw(format!("PRIVMSG {} :{}", target, text))
@@ -322,6 +327,9 @@ pub fn dispatch<L: Listener>(listener: L, settings: Settings) -> Result<(), Erro
     let (writer, reader) = try!(connect(settings.addr, settings.reconnection, settings.encoding));
 
     let irc = Irc::new(writer.clone());
+    if !settings.password.is_empty() {
+        try!(irc.pass(settings.password));
+    }
     try!(irc.nick(settings.nickname));
     try!(irc.user(settings.username, settings.realname));
 
