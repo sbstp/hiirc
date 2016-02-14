@@ -147,6 +147,15 @@
 <span id="105">105</span>
 <span id="106">106</span>
 <span id="107">107</span>
+<span id="108">108</span>
+<span id="109">109</span>
+<span id="110">110</span>
+<span id="111">111</span>
+<span id="112">112</span>
+<span id="113">113</span>
+<span id="114">114</span>
+<span id="115">115</span>
+<span id="116">116</span>
 </pre><pre class='rust '>
 <span class='kw'>use</span> <span class='ident'>encoding</span>::<span class='ident'>EncodingRef</span>;
 <span class='kw'>use</span> <span class='ident'>encoding</span>::<span class='ident'>all</span>::<span class='ident'>UTF_8</span>;
@@ -174,6 +183,8 @@
     <span class='kw'>pub</span> <span class='ident'>auto_ping</span>: <span class='ident'>bool</span>,
     <span class='doccomment'>/// Encoding used for the connection.</span>
     <span class='kw'>pub</span> <span class='ident'>encoding</span>: <span class='ident'>EncodingRef</span>,
+    <span class='doccomment'>/// Server password</span>
+    <span class='kw'>pub</span> <span class='ident'>password</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>str</span>,
 }
 
 <span class='kw'>impl</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span> <span class='ident'>Settings</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span> {
@@ -202,6 +213,7 @@
             <span class='ident'>auto_ident</span>: <span class='boolval'>true</span>,
             <span class='ident'>auto_ping</span>: <span class='boolval'>true</span>,
             <span class='ident'>encoding</span>: <span class='ident'>UTF_8</span>,
+            <span class='ident'>password</span>: <span class='string'>&quot;&quot;</span>,
         }
     }
 
@@ -244,6 +256,12 @@
     <span class='doccomment'>/// Modify the encoding used for this connection.</span>
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>encoding</span>(<span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>encoding</span>: <span class='ident'>EncodingRef</span>) <span class='op'>-&gt;</span> <span class='ident'>Settings</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span> {
         <span class='self'>self</span>.<span class='ident'>encoding</span> <span class='op'>=</span> <span class='ident'>encoding</span>;
+        <span class='self'>self</span>
+    }
+
+    <span class='doccomment'>/// Modify the server password.</span>
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>password</span>(<span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>password</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>str</span>) <span class='op'>-&gt;</span> <span class='ident'>Settings</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span> {
+        <span class='self'>self</span>.<span class='ident'>password</span> <span class='op'>=</span> <span class='ident'>password</span>;
         <span class='self'>self</span>
     }
 

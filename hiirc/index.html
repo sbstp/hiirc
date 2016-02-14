@@ -45,7 +45,7 @@
             <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                 [<span class='inner'>&#x2212;</span>]
             </a>
-        </span><a id='src-0' class='srclink' href='../src/hiirc/lib.rs.html#1-26' title='goto source code'>[src]</a></span></h1>
+        </span><a id='src-0' class='srclink' href='../src/hiirc/lib.rs.html#1-27' title='goto source code'>[src]</a></span></h1>
 <div class='docblock'><p><code>hiirc</code> is a library built on top of <a href="https://github.com/SBSTP/loirc">loirc</a>. The goal
 is to offer a friendly, event-based API.</p>
 
@@ -79,6 +79,15 @@ once it is configured to your needs.</p>
                                title='hiirc::ChannelUser'>ChannelUser</a></td>
                         <td class='docblock short'>
                              <p>Represents a user inside of a channel.</p>
+
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='struct' href='struct.DeferredWriter.html'
+                               title='hiirc::DeferredWriter'>DeferredWriter</a></td>
+                        <td class='docblock short'>
+                             <p>The DeferredWriter can send commands to the irc server.</p>
 
                         </td>
                     </tr>
@@ -211,6 +220,15 @@ once it is configured to your needs.</p>
                     </tr>
                 </table><h2 id='traits' class='section-header'><a href="#traits">Traits</a></h2>
 <table>
+                    <tr class=' module-item'>
+                        <td><a class='trait' href='trait.IrcWrite.html'
+                               title='hiirc::IrcWrite'>IrcWrite</a></td>
+                        <td class='docblock short'>
+                             <p>Ability to send commands to the irc server.</p>
+
+                        </td>
+                    </tr>
+                
                     <tr class=' module-item'>
                         <td><a class='trait' href='trait.Listener.html'
                                title='hiirc::Listener'>Listener</a></td>

@@ -673,6 +673,59 @@
 <span id="631">631</span>
 <span id="632">632</span>
 <span id="633">633</span>
+<span id="634">634</span>
+<span id="635">635</span>
+<span id="636">636</span>
+<span id="637">637</span>
+<span id="638">638</span>
+<span id="639">639</span>
+<span id="640">640</span>
+<span id="641">641</span>
+<span id="642">642</span>
+<span id="643">643</span>
+<span id="644">644</span>
+<span id="645">645</span>
+<span id="646">646</span>
+<span id="647">647</span>
+<span id="648">648</span>
+<span id="649">649</span>
+<span id="650">650</span>
+<span id="651">651</span>
+<span id="652">652</span>
+<span id="653">653</span>
+<span id="654">654</span>
+<span id="655">655</span>
+<span id="656">656</span>
+<span id="657">657</span>
+<span id="658">658</span>
+<span id="659">659</span>
+<span id="660">660</span>
+<span id="661">661</span>
+<span id="662">662</span>
+<span id="663">663</span>
+<span id="664">664</span>
+<span id="665">665</span>
+<span id="666">666</span>
+<span id="667">667</span>
+<span id="668">668</span>
+<span id="669">669</span>
+<span id="670">670</span>
+<span id="671">671</span>
+<span id="672">672</span>
+<span id="673">673</span>
+<span id="674">674</span>
+<span id="675">675</span>
+<span id="676">676</span>
+<span id="677">677</span>
+<span id="678">678</span>
+<span id="679">679</span>
+<span id="680">680</span>
+<span id="681">681</span>
+<span id="682">682</span>
+<span id="683">683</span>
+<span id="684">684</span>
+<span id="685">685</span>
+<span id="686">686</span>
 </pre><pre class='rust '>
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>collections</span>::<span class='ident'>HashMap</span>;
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>io</span>;
@@ -804,6 +857,93 @@
     }
 }
 
+<span class='doccomment'>/// Ability to send commands to the irc server.</span>
+<span class='doccomment'>///</span>
+<span class='doccomment'>/// This trait represents the ability to send messages</span>
+<span class='doccomment'>/// to a server. It&#39;s implemented by Irc and Deferred.</span>
+<span class='kw'>pub</span> <span class='kw'>trait</span> <span class='ident'>IrcWrite</span> {
+
+    <span class='doccomment'>/// Send a raw message. A newline is added for you.</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// If you add a new line it will be refused as a multiline message.</span>
+    <span class='kw'>fn</span> <span class='ident'>raw</span><span class='op'>&lt;</span><span class='ident'>S</span>: <span class='ident'>AsRef</span><span class='op'>&lt;</span><span class='ident'>str</span><span class='op'>&gt;&gt;</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>raw</span>: <span class='ident'>S</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span>(), <span class='ident'>Error</span><span class='op'>&gt;</span>;
+
+    <span class='doccomment'>/// NICK command.</span>
+    <span class='kw'>fn</span> <span class='ident'>nick</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>nickname</span>: <span class='kw-2'>&amp;</span><span class='ident'>str</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span>(), <span class='ident'>Error</span><span class='op'>&gt;</span> {
+        <span class='self'>self</span>.<span class='ident'>raw</span>(<span class='macro'>format</span><span class='macro'>!</span>(<span class='string'>&quot;NICK {}&quot;</span>, <span class='ident'>nickname</span>))
+    }
+
+    <span class='doccomment'>/// USER command.</span>
+    <span class='kw'>fn</span> <span class='ident'>user</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>username</span>: <span class='kw-2'>&amp;</span><span class='ident'>str</span>, <span class='ident'>realname</span>: <span class='kw-2'>&amp;</span><span class='ident'>str</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span>(), <span class='ident'>Error</span><span class='op'>&gt;</span> {
+        <span class='self'>self</span>.<span class='ident'>raw</span>(<span class='macro'>format</span><span class='macro'>!</span>(<span class='string'>&quot;USER {} 8 * :{}&quot;</span>, <span class='ident'>username</span>, <span class='ident'>realname</span>))
+    }
+
+    <span class='doccomment'>/// PING command.</span>
+    <span class='kw'>fn</span> <span class='ident'>ping</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>server</span>: <span class='kw-2'>&amp;</span><span class='ident'>str</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span>(), <span class='ident'>Error</span><span class='op'>&gt;</span> {
+        <span class='self'>self</span>.<span class='ident'>raw</span>(<span class='macro'>format</span><span class='macro'>!</span>(<span class='string'>&quot;PING {}&quot;</span>, <span class='ident'>server</span>))
+    }
+
+    <span class='doccomment'>/// PONG command.</span>
+    <span class='kw'>fn</span> <span class='ident'>pong</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>server</span>: <span class='kw-2'>&amp;</span><span class='ident'>str</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span>(), <span class='ident'>Error</span><span class='op'>&gt;</span> {
+        <span class='self'>self</span>.<span class='ident'>raw</span>(<span class='macro'>format</span><span class='macro'>!</span>(<span class='string'>&quot;PONG {}&quot;</span>, <span class='ident'>server</span>))
+    }
+
+    <span class='doccomment'>/// PASS command.</span>
+    <span class='kw'>fn</span> <span class='ident'>pass</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>password</span>: <span class='kw-2'>&amp;</span><span class='ident'>str</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span>(), <span class='ident'>Error</span><span class='op'>&gt;</span> {
+        <span class='self'>self</span>.<span class='ident'>raw</span>(<span class='macro'>format</span><span class='macro'>!</span>(<span class='string'>&quot;PASS {}&quot;</span>, <span class='ident'>password</span>))
+    }
+
+    <span class='doccomment'>/// PRIVMSG command.</span>
+    <span class='kw'>fn</span> <span class='ident'>privmsg</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>target</span>: <span class='kw-2'>&amp;</span><span class='ident'>str</span>, <span class='ident'>text</span>: <span class='kw-2'>&amp;</span><span class='ident'>str</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span>(), <span class='ident'>Error</span><span class='op'>&gt;</span> {
+        <span class='self'>self</span>.<span class='ident'>raw</span>(<span class='macro'>format</span><span class='macro'>!</span>(<span class='string'>&quot;PRIVMSG {} :{}&quot;</span>, <span class='ident'>target</span>, <span class='ident'>text</span>))
+    }
+
+    <span class='doccomment'>/// JOIN command.</span>
+    <span class='kw'>fn</span> <span class='ident'>join</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>channel</span>: <span class='kw-2'>&amp;</span><span class='ident'>str</span>, <span class='ident'>password</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='ident'>str</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span>(), <span class='ident'>Error</span><span class='op'>&gt;</span> {
+        <span class='kw'>match</span> <span class='ident'>password</span> {
+            <span class='prelude-val'>None</span> <span class='op'>=&gt;</span> <span class='self'>self</span>.<span class='ident'>raw</span>(<span class='macro'>format</span><span class='macro'>!</span>(<span class='string'>&quot;JOIN {}&quot;</span>, <span class='ident'>channel</span>)),
+            <span class='prelude-val'>Some</span>(<span class='ident'>password</span>) <span class='op'>=&gt;</span> <span class='self'>self</span>.<span class='ident'>raw</span>(<span class='macro'>format</span><span class='macro'>!</span>(<span class='string'>&quot;JOIN {} {}&quot;</span>, <span class='ident'>channel</span>, <span class='ident'>password</span>)),
+        }
+    }
+
+    <span class='doccomment'>/// PART command.</span>
+    <span class='kw'>fn</span> <span class='ident'>part</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>channel</span>: <span class='kw-2'>&amp;</span><span class='ident'>str</span>, <span class='ident'>message</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='ident'>str</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span>(), <span class='ident'>Error</span><span class='op'>&gt;</span> {
+        <span class='kw'>match</span> <span class='ident'>message</span> {
+            <span class='prelude-val'>None</span> <span class='op'>=&gt;</span> <span class='self'>self</span>.<span class='ident'>raw</span>(<span class='macro'>format</span><span class='macro'>!</span>(<span class='string'>&quot;PART {}&quot;</span>, <span class='ident'>channel</span>)),
+            <span class='prelude-val'>Some</span>(<span class='ident'>message</span>) <span class='op'>=&gt;</span> <span class='self'>self</span>.<span class='ident'>raw</span>(<span class='macro'>format</span><span class='macro'>!</span>(<span class='string'>&quot;PART {} :{}&quot;</span>, <span class='ident'>channel</span>, <span class='ident'>message</span>)),
+        }
+    }
+
+    <span class='doccomment'>/// QUIT command.</span>
+    <span class='kw'>fn</span> <span class='ident'>quit</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>message</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='ident'>str</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span>(), <span class='ident'>Error</span><span class='op'>&gt;</span> {
+        <span class='kw'>match</span> <span class='ident'>message</span> {
+            <span class='prelude-val'>None</span> <span class='op'>=&gt;</span> <span class='self'>self</span>.<span class='ident'>raw</span>(<span class='macro'>format</span><span class='macro'>!</span>(<span class='string'>&quot;QUIT :No message&quot;</span>)),
+            <span class='prelude-val'>Some</span>(<span class='ident'>message</span>) <span class='op'>=&gt;</span> <span class='self'>self</span>.<span class='ident'>raw</span>(<span class='macro'>format</span><span class='macro'>!</span>(<span class='string'>&quot;QUIT :{}&quot;</span>, <span class='ident'>message</span>)),
+        }
+    }
+
+    <span class='doccomment'>/// Retrive the topic of a given channel.</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// The `topic` event will receive the information.</span>
+    <span class='kw'>fn</span> <span class='ident'>get_topic</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>channel</span>: <span class='kw-2'>&amp;</span><span class='ident'>str</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span>(), <span class='ident'>Error</span><span class='op'>&gt;</span> {
+        <span class='self'>self</span>.<span class='ident'>raw</span>(<span class='macro'>format</span><span class='macro'>!</span>(<span class='string'>&quot;TOPIC {}&quot;</span>, <span class='ident'>channel</span>))
+    }
+
+    <span class='doccomment'>/// Set the topic of a channel.</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// To remove the topic of a channel, use an empty topic string.</span>
+    <span class='doccomment'>/// It will also trigger a `topic_change` event.</span>
+    <span class='kw'>fn</span> <span class='ident'>set_topic</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>channel</span>: <span class='kw-2'>&amp;</span><span class='ident'>str</span>, <span class='ident'>topic</span>: <span class='kw-2'>&amp;</span><span class='ident'>str</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span>(), <span class='ident'>Error</span><span class='op'>&gt;</span> {
+        <span class='self'>self</span>.<span class='ident'>raw</span>(<span class='macro'>format</span><span class='macro'>!</span>(<span class='string'>&quot;TOPIC {} :{}&quot;</span>, <span class='ident'>channel</span>, <span class='ident'>topic</span>))
+    }
+
+    <span class='doccomment'>/// KICK command.</span>
+    <span class='kw'>fn</span> <span class='ident'>kick</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>channel</span>: <span class='kw-2'>&amp;</span><span class='ident'>str</span>, <span class='ident'>nickname</span>: <span class='kw-2'>&amp;</span><span class='ident'>str</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span>(), <span class='ident'>Error</span><span class='op'>&gt;</span> {
+        <span class='self'>self</span>.<span class='ident'>raw</span>(<span class='macro'>format</span><span class='macro'>!</span>(<span class='string'>&quot;KICK {} {}&quot;</span>, <span class='ident'>channel</span>, <span class='ident'>nickname</span>))
+    }
+
+}
+
 <span class='doccomment'>/// Represents the state of this connection.</span>
 <span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>Irc</span> {
     <span class='ident'>writer</span>: <span class='ident'>Writer</span>,
@@ -910,10 +1050,18 @@
         <span class='prelude-val'>Ok</span>(())
     }
 
-    <span class='doccomment'>/// Send a raw message. A newline is added for you.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// If you add a new line it will be refused as a multiline message.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>raw</span><span class='op'>&lt;</span><span class='ident'>S</span>: <span class='ident'>AsRef</span><span class='op'>&lt;</span><span class='ident'>str</span><span class='op'>&gt;&gt;</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>raw</span>: <span class='ident'>S</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span>(), <span class='ident'>Error</span><span class='op'>&gt;</span> {
+    <span class='doccomment'>/// Create a DeferredWriter that shares this connection.</span>
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>deferred</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>DeferredWriter</span> {
+        <span class='ident'>DeferredWriter</span> {
+            <span class='ident'>writer</span>: <span class='self'>self</span>.<span class='ident'>writer</span>.<span class='ident'>clone</span>(),
+        }
+    }
+
+}
+
+<span class='kw'>impl</span> <span class='ident'>IrcWrite</span> <span class='kw'>for</span> <span class='ident'>Irc</span> {
+
+    <span class='kw'>fn</span> <span class='ident'>raw</span><span class='op'>&lt;</span><span class='ident'>S</span>: <span class='ident'>AsRef</span><span class='op'>&lt;</span><span class='ident'>str</span><span class='op'>&gt;&gt;</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>raw</span>: <span class='ident'>S</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span>(), <span class='ident'>Error</span><span class='op'>&gt;</span> {
         <span class='kw'>let</span> <span class='ident'>raw</span> <span class='op'>=</span> <span class='ident'>raw</span>.<span class='ident'>as_ref</span>();
         <span class='kw'>if</span> <span class='ident'>raw</span>.<span class='ident'>contains</span>(<span class='string'>&quot;\n&quot;</span>) <span class='op'>||</span> <span class='ident'>raw</span>.<span class='ident'>contains</span>(<span class='string'>&quot;\r&quot;</span>) {
             <span class='kw'>return</span> <span class='prelude-val'>Err</span>(<span class='ident'>Error</span>::<span class='ident'>Multiline</span>)
@@ -922,73 +1070,28 @@
         <span class='prelude-val'>Ok</span>(())
     }
 
-    <span class='doccomment'>/// NICK command.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>nick</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>nickname</span>: <span class='kw-2'>&amp;</span><span class='ident'>str</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span>(), <span class='ident'>Error</span><span class='op'>&gt;</span> {
-        <span class='self'>self</span>.<span class='ident'>raw</span>(<span class='macro'>format</span><span class='macro'>!</span>(<span class='string'>&quot;NICK {}&quot;</span>, <span class='ident'>nickname</span>))
-    }
+}
 
-    <span class='doccomment'>/// USER command.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>user</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>username</span>: <span class='kw-2'>&amp;</span><span class='ident'>str</span>, <span class='ident'>realname</span>: <span class='kw-2'>&amp;</span><span class='ident'>str</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span>(), <span class='ident'>Error</span><span class='op'>&gt;</span> {
-        <span class='self'>self</span>.<span class='ident'>raw</span>(<span class='macro'>format</span><span class='macro'>!</span>(<span class='string'>&quot;USER {} 8 * :{}&quot;</span>, <span class='ident'>username</span>, <span class='ident'>realname</span>))
-    }
+<span class='doccomment'>/// The DeferredWriter can send commands to the irc server.</span>
+<span class='doccomment'>///</span>
+<span class='doccomment'>/// The difference with the Irc struct is that the DeferredWriter contains no data</span>
+<span class='doccomment'>/// about the state and channels. This means that it can be cloned without any fear</span>
+<span class='doccomment'>/// and used at any time. This is useful when calling methods that might block for</span>
+<span class='doccomment'>/// a while. You can call them in a seperate thread and not block the event loop.</span>
+<span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Clone</span>)]</span>
+<span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>DeferredWriter</span> {
+    <span class='ident'>writer</span>: <span class='ident'>Writer</span>,
+}
 
-    <span class='doccomment'>/// PING command.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>ping</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>server</span>: <span class='kw-2'>&amp;</span><span class='ident'>str</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span>(), <span class='ident'>Error</span><span class='op'>&gt;</span> {
-        <span class='self'>self</span>.<span class='ident'>raw</span>(<span class='macro'>format</span><span class='macro'>!</span>(<span class='string'>&quot;PING {}&quot;</span>, <span class='ident'>server</span>))
-    }
+<span class='kw'>impl</span> <span class='ident'>IrcWrite</span> <span class='kw'>for</span> <span class='ident'>DeferredWriter</span> {
 
-    <span class='doccomment'>/// PONG command.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>pong</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>server</span>: <span class='kw-2'>&amp;</span><span class='ident'>str</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span>(), <span class='ident'>Error</span><span class='op'>&gt;</span> {
-        <span class='self'>self</span>.<span class='ident'>raw</span>(<span class='macro'>format</span><span class='macro'>!</span>(<span class='string'>&quot;PONG {}&quot;</span>, <span class='ident'>server</span>))
-    }
-
-    <span class='doccomment'>/// PRIVMSG command.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>privmsg</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>target</span>: <span class='kw-2'>&amp;</span><span class='ident'>str</span>, <span class='ident'>text</span>: <span class='kw-2'>&amp;</span><span class='ident'>str</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span>(), <span class='ident'>Error</span><span class='op'>&gt;</span> {
-        <span class='self'>self</span>.<span class='ident'>raw</span>(<span class='macro'>format</span><span class='macro'>!</span>(<span class='string'>&quot;PRIVMSG {} :{}&quot;</span>, <span class='ident'>target</span>, <span class='ident'>text</span>))
-    }
-
-    <span class='doccomment'>/// JOIN command.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>join</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>channel</span>: <span class='kw-2'>&amp;</span><span class='ident'>str</span>, <span class='ident'>password</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='ident'>str</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span>(), <span class='ident'>Error</span><span class='op'>&gt;</span> {
-        <span class='kw'>match</span> <span class='ident'>password</span> {
-            <span class='prelude-val'>None</span> <span class='op'>=&gt;</span> <span class='self'>self</span>.<span class='ident'>raw</span>(<span class='macro'>format</span><span class='macro'>!</span>(<span class='string'>&quot;JOIN {}&quot;</span>, <span class='ident'>channel</span>)),
-            <span class='prelude-val'>Some</span>(<span class='ident'>password</span>) <span class='op'>=&gt;</span> <span class='self'>self</span>.<span class='ident'>raw</span>(<span class='macro'>format</span><span class='macro'>!</span>(<span class='string'>&quot;JOIN {} {}&quot;</span>, <span class='ident'>channel</span>, <span class='ident'>password</span>)),
+    <span class='kw'>fn</span> <span class='ident'>raw</span><span class='op'>&lt;</span><span class='ident'>S</span>: <span class='ident'>AsRef</span><span class='op'>&lt;</span><span class='ident'>str</span><span class='op'>&gt;&gt;</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>raw</span>: <span class='ident'>S</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span>(), <span class='ident'>Error</span><span class='op'>&gt;</span> {
+        <span class='kw'>let</span> <span class='ident'>raw</span> <span class='op'>=</span> <span class='ident'>raw</span>.<span class='ident'>as_ref</span>();
+        <span class='kw'>if</span> <span class='ident'>raw</span>.<span class='ident'>contains</span>(<span class='string'>&quot;\n&quot;</span>) <span class='op'>||</span> <span class='ident'>raw</span>.<span class='ident'>contains</span>(<span class='string'>&quot;\r&quot;</span>) {
+            <span class='kw'>return</span> <span class='prelude-val'>Err</span>(<span class='ident'>Error</span>::<span class='ident'>Multiline</span>)
         }
-    }
-
-    <span class='doccomment'>/// PART command.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>part</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>channel</span>: <span class='kw-2'>&amp;</span><span class='ident'>str</span>, <span class='ident'>message</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='ident'>str</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span>(), <span class='ident'>Error</span><span class='op'>&gt;</span> {
-        <span class='kw'>match</span> <span class='ident'>message</span> {
-            <span class='prelude-val'>None</span> <span class='op'>=&gt;</span> <span class='self'>self</span>.<span class='ident'>raw</span>(<span class='macro'>format</span><span class='macro'>!</span>(<span class='string'>&quot;PART {}&quot;</span>, <span class='ident'>channel</span>)),
-            <span class='prelude-val'>Some</span>(<span class='ident'>message</span>) <span class='op'>=&gt;</span> <span class='self'>self</span>.<span class='ident'>raw</span>(<span class='macro'>format</span><span class='macro'>!</span>(<span class='string'>&quot;PART {} :{}&quot;</span>, <span class='ident'>channel</span>, <span class='ident'>message</span>)),
-        }
-    }
-
-    <span class='doccomment'>/// QUIT command.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>quit</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>message</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='ident'>str</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span>(), <span class='ident'>Error</span><span class='op'>&gt;</span> {
-        <span class='kw'>match</span> <span class='ident'>message</span> {
-            <span class='prelude-val'>None</span> <span class='op'>=&gt;</span> <span class='self'>self</span>.<span class='ident'>raw</span>(<span class='macro'>format</span><span class='macro'>!</span>(<span class='string'>&quot;QUIT :No message&quot;</span>)),
-            <span class='prelude-val'>Some</span>(<span class='ident'>message</span>) <span class='op'>=&gt;</span> <span class='self'>self</span>.<span class='ident'>raw</span>(<span class='macro'>format</span><span class='macro'>!</span>(<span class='string'>&quot;QUIT :{}&quot;</span>, <span class='ident'>message</span>)),
-        }
-    }
-
-    <span class='doccomment'>/// Retrive the topic of a given channel.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// The `topic` event will receive the information.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>get_topic</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>channel</span>: <span class='kw-2'>&amp;</span><span class='ident'>str</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span>(), <span class='ident'>Error</span><span class='op'>&gt;</span> {
-        <span class='self'>self</span>.<span class='ident'>raw</span>(<span class='macro'>format</span><span class='macro'>!</span>(<span class='string'>&quot;TOPIC {}&quot;</span>, <span class='ident'>channel</span>))
-    }
-
-    <span class='doccomment'>/// Set the topic of a channel.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// To remove the topic of a channel, use an empty topic string.</span>
-    <span class='doccomment'>/// It will also trigger a `topic_change` event.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>set_topic</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>channel</span>: <span class='kw-2'>&amp;</span><span class='ident'>str</span>, <span class='ident'>topic</span>: <span class='kw-2'>&amp;</span><span class='ident'>str</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span>(), <span class='ident'>Error</span><span class='op'>&gt;</span> {
-        <span class='self'>self</span>.<span class='ident'>raw</span>(<span class='macro'>format</span><span class='macro'>!</span>(<span class='string'>&quot;TOPIC {} :{}&quot;</span>, <span class='ident'>channel</span>, <span class='ident'>topic</span>))
-    }
-
-    <span class='doccomment'>/// KICK command.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>kick</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>channel</span>: <span class='kw-2'>&amp;</span><span class='ident'>str</span>, <span class='ident'>nickname</span>: <span class='kw-2'>&amp;</span><span class='ident'>str</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span>(), <span class='ident'>Error</span><span class='op'>&gt;</span> {
-        <span class='self'>self</span>.<span class='ident'>raw</span>(<span class='macro'>format</span><span class='macro'>!</span>(<span class='string'>&quot;KICK {} {}&quot;</span>, <span class='ident'>channel</span>, <span class='ident'>nickname</span>))
+        <span class='macro'>try</span><span class='macro'>!</span>(<span class='self'>self</span>.<span class='ident'>writer</span>.<span class='ident'>raw</span>(<span class='macro'>format</span><span class='macro'>!</span>(<span class='string'>&quot;{}\n&quot;</span>, <span class='ident'>raw</span>)));
+        <span class='prelude-val'>Ok</span>(())
     }
 
 }
@@ -998,6 +1101,9 @@
     <span class='kw'>let</span> (<span class='ident'>writer</span>, <span class='ident'>reader</span>) <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>connect</span>(<span class='ident'>settings</span>.<span class='ident'>addr</span>, <span class='ident'>settings</span>.<span class='ident'>reconnection</span>, <span class='ident'>settings</span>.<span class='ident'>encoding</span>));
 
     <span class='kw'>let</span> <span class='ident'>irc</span> <span class='op'>=</span> <span class='ident'>Irc</span>::<span class='ident'>new</span>(<span class='ident'>writer</span>.<span class='ident'>clone</span>());
+    <span class='kw'>if</span> <span class='op'>!</span><span class='ident'>settings</span>.<span class='ident'>password</span>.<span class='ident'>is_empty</span>() {
+        <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>irc</span>.<span class='ident'>pass</span>(<span class='ident'>settings</span>.<span class='ident'>password</span>));
+    }
     <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>irc</span>.<span class='ident'>nick</span>(<span class='ident'>settings</span>.<span class='ident'>nickname</span>));
     <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>irc</span>.<span class='ident'>user</span>(<span class='ident'>settings</span>.<span class='ident'>username</span>, <span class='ident'>settings</span>.<span class='ident'>realname</span>));
 

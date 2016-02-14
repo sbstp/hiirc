@@ -66,6 +66,7 @@
 <span id="24">24</span>
 <span id="25">25</span>
 <span id="26">26</span>
+<span id="27">27</span>
 </pre><pre class='rust '>
 <span class='attribute'>#<span class='op'>!</span>[<span class='ident'>deny</span>(<span class='ident'>missing_docs</span>)]</span>
 <span class='doccomment'>//! `hiirc` is a library built on top of [loirc](https://github.com/SBSTP/loirc). The goal</span>
@@ -87,7 +88,8 @@
 <span class='kw'>mod</span> <span class='ident'>settings</span>;
 
 <span class='kw'>pub</span> <span class='kw'>use</span> <span class='ident'>core</span>::{<span class='ident'>dispatch</span>};
-<span class='kw'>pub</span> <span class='kw'>use</span> <span class='ident'>core</span>::{<span class='ident'>Channel</span>, <span class='ident'>ConnectionStatus</span>, <span class='ident'>Error</span>, <span class='ident'>Irc</span>, <span class='ident'>ChannelUser</span>, <span class='ident'>ChannelUserStatus</span>};
+<span class='kw'>pub</span> <span class='kw'>use</span> <span class='ident'>core</span>::{<span class='ident'>Channel</span>, <span class='ident'>ConnectionStatus</span>, <span class='ident'>Error</span>, <span class='ident'>Irc</span>, <span class='ident'>IrcWrite</span>, <span class='ident'>DeferredWriter</span>, <span class='ident'>ChannelUser</span>,
+                <span class='ident'>ChannelUserStatus</span>};
 <span class='kw'>pub</span> <span class='kw'>use</span> <span class='ident'>listener</span>::<span class='ident'>Listener</span>;
 <span class='kw'>pub</span> <span class='kw'>use</span> <span class='ident'>settings</span>::<span class='ident'>Settings</span>;
 <span class='kw'>pub</span> <span class='kw'>use</span> <span class='ident'>loirc</span>::<span class='ident'>Error</span> <span class='kw'>as</span> <span class='ident'>LoircError</span>;

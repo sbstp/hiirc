@@ -47,20 +47,20 @@
             </a>
         </span><a id='src-104' class='srclink' href='../../src/encoding/types.rs.html#101-115' title='goto source code'>[src]</a></span></h1>
 <pre class='rust trait'>pub trait StringWriter {
-    fn <a href='#tymethod.write_char' class='fnname'>write_char</a>(&amp;mut self, c: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.char.html'>char</a>);
-    fn <a href='#tymethod.write_str' class='fnname'>write_str</a>(&amp;mut self, s: &amp;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>);
+    fn <a href='#tymethod.write_char' class='fnname'>write_char</a>(&amp;mut self, c: <a href='https://doc.rust-lang.org/nightly/std/primitive.char.html'>char</a>);
+    fn <a href='#tymethod.write_str' class='fnname'>write_str</a>(&amp;mut self, s: &amp;<a href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>);
 
-    fn <a href='#method.writer_hint' class='fnname'>writer_hint</a>(&amp;mut self, _expectedlen: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a>) { ... }
+    fn <a href='#method.writer_hint' class='fnname'>writer_hint</a>(&amp;mut self, _expectedlen: <a href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a>) { ... }
 }</pre><div class='docblock'><p>String writer used by decoders. In most cases this will be an owned string.</p>
 </div>
             <h2 id='required-methods'>Required Methods</h2>
             <div class='methods'>
-        <h3 id='tymethod.write_char' class='method stab '><code>fn <a href='#tymethod.write_char' class='fnname'>write_char</a>(&amp;mut self, c: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.char.html'>char</a>)</code></h3><div class='docblock'><p>Writes a single character.</p>
-</div><h3 id='tymethod.write_str' class='method stab '><code>fn <a href='#tymethod.write_str' class='fnname'>write_str</a>(&amp;mut self, s: &amp;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>)</code></h3><div class='docblock'><p>Writes a string.</p>
+        <h3 id='tymethod.write_char' class='method stab '><code>fn <a href='#tymethod.write_char' class='fnname'>write_char</a>(&amp;mut self, c: <a href='https://doc.rust-lang.org/nightly/std/primitive.char.html'>char</a>)</code></h3><div class='docblock'><p>Writes a single character.</p>
+</div><h3 id='tymethod.write_str' class='method stab '><code>fn <a href='#tymethod.write_str' class='fnname'>write_str</a>(&amp;mut self, s: &amp;<a href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>)</code></h3><div class='docblock'><p>Writes a string.</p>
 </div></div>
             <h2 id='provided-methods'>Provided Methods</h2>
             <div class='methods'>
-        <h3 id='method.writer_hint' class='method stab '><code>fn <a href='#method.writer_hint' class='fnname'>writer_hint</a>(&amp;mut self, _expectedlen: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a>)</code></h3><div class='docblock'><p>Hints an expected lower bound on the length (in bytes) of the output
+        <h3 id='method.writer_hint' class='method stab '><code>fn <a href='#method.writer_hint' class='fnname'>writer_hint</a>(&amp;mut self, _expectedlen: <a href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a>)</code></h3><div class='docblock'><p>Hints an expected lower bound on the length (in bytes) of the output
 until the next call to <code>writer_hint</code>,
 so that the writer can reserve the memory for writing.
 <code>RawDecoder</code>s are recommended but not required to call this method
