@@ -1,6 +1,6 @@
 //! Utilities that are not part of the official IRC protocol standard.
 
-use core::{Error, Irc};
+use core::{Error, Irc, IrcWrite};
 
 /// An extension trait to the Irc struct that adds NickServ capabilities.
 ///

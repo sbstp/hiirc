@@ -128,6 +128,93 @@ impl From<io::Error> for Error {
     }
 }
 
+/// Ability to send commands to the irc server.
+///
+/// This trait represents the ability to send messages
+/// to a server. It's implemented by Irc and Deferred.
+pub trait IrcWrite {
+
+    /// Send a raw message. A newline is added for you.
+    ///
+    /// If you add a new line it will be refused as a multiline message.
+    fn raw<S: AsRef<str>>(&self, raw: S) -> Result<(), Error>;
+
+    /// NICK command.
+    fn nick(&self, nickname: &str) -> Result<(), Error> {
+        self.raw(format!("NICK {}", nickname))
+    }
+
+    /// USER command.
+    fn user(&self, username: &str, realname: &str) -> Result<(), Error> {
+        self.raw(format!("USER {} 8 * :{}", username, realname))
+    }
+
+    /// PING command.
+    fn ping(&self, server: &str) -> Result<(), Error> {
+        self.raw(format!("PING {}", server))
+    }
+
+    /// PONG command.
+    fn pong(&self, server: &str) -> Result<(), Error> {
+        self.raw(format!("PONG {}", server))
+    }
+
+    /// PASS command.
+    fn pass(&self, password: &str) -> Result<(), Error> {
+        self.raw(format!("PASS {}", password))
+    }
+
+    /// PRIVMSG command.
+    fn privmsg(&self, target: &str, text: &str) -> Result<(), Error> {
+        self.raw(format!("PRIVMSG {} :{}", target, text))
+    }
+
+    /// JOIN command.
+    fn join(&self, channel: &str, password: Option<&str>) -> Result<(), Error> {
+        match password {
+            None => self.raw(format!("JOIN {}", channel)),
+            Some(password) => self.raw(format!("JOIN {} {}", channel, password)),
+        }
+    }
+
+    /// PART command.
+    fn part(&self, channel: &str, message: Option<&str>) -> Result<(), Error> {
+        match message {
+            None => self.raw(format!("PART {}", channel)),
+            Some(message) => self.raw(format!("PART {} :{}", channel, message)),
+        }
+    }
+
+    /// QUIT command.
+    fn quit(&self, message: Option<&str>) -> Result<(), Error> {
+        match message {
+            None => self.raw(format!("QUIT :No message")),
+            Some(message) => self.raw(format!("QUIT :{}", message)),
+        }
+    }
+
+    /// Retrive the topic of a given channel.
+    ///
+    /// The `topic` event will receive the information.
+    fn get_topic(&self, channel: &str) -> Result<(), Error> {
+        self.raw(format!("TOPIC {}", channel))
+    }
+
+    /// Set the topic of a channel.
+    ///
+    /// To remove the topic of a channel, use an empty topic string.
+    /// It will also trigger a `topic_change` event.
+    fn set_topic(&self, channel: &str, topic: &str) -> Result<(), Error> {
+        self.raw(format!("TOPIC {} :{}", channel, topic))
+    }
+
+    /// KICK command.
+    fn kick(&self, channel: &str, nickname: &str) -> Result<(), Error> {
+        self.raw(format!("KICK {} {}", channel, nickname))
+    }
+
+}
+
 /// Represents the state of this connection.
 pub struct Irc {
     writer: Writer,
@@ -234,10 +321,18 @@ impl Irc {
         Ok(())
     }
 
-    /// Send a raw message. A newline is added for you.
-    ///
-    /// If you add a new line it will be refused as a multiline message.
-    pub fn raw<S: AsRef<str>>(&self, raw: S) -> Result<(), Error> {
+    /// Create a DeferredWriter that shares this connection.
+    pub fn deferred(&self) -> DeferredWriter {
+        DeferredWriter {
+            writer: self.writer.clone(),
+        }
+    }
+
+}
+
+impl IrcWrite for Irc {
+
+    fn raw<S: AsRef<str>>(&self, raw: S) -> Result<(), Error> {
         let raw = raw.as_ref();
         if raw.contains("\n") || raw.contains("\r") {
             return Err(Error::Multiline)
@@ -246,78 +341,28 @@ impl Irc {
         Ok(())
     }
 
-    /// NICK command.
-    pub fn nick(&self, nickname: &str) -> Result<(), Error> {
-        self.raw(format!("NICK {}", nickname))
-    }
+}
 
-    /// USER command.
-    pub fn user(&self, username: &str, realname: &str) -> Result<(), Error> {
-        self.raw(format!("USER {} 8 * :{}", username, realname))
-    }
+/// The DeferredWriter can send commands to the irc server.
+///
+/// The difference with the Irc struct is that the DeferredWriter contains no data
+/// about the state and channels. This means that it can be cloned without any fear
+/// and used at any time. This is useful when calling methods that might block for
+/// a while. You can call them in a seperate thread and not block the event loop.
+#[derive(Clone)]
+pub struct DeferredWriter {
+    writer: Writer,
+}
 
-    /// PING command.
-    pub fn ping(&self, server: &str) -> Result<(), Error> {
-        self.raw(format!("PING {}", server))
-    }
+impl IrcWrite for DeferredWriter {
 
-    /// PONG command.
-    pub fn pong(&self, server: &str) -> Result<(), Error> {
-        self.raw(format!("PONG {}", server))
-    }
-
-    /// PASS command.
-    pub fn pass(&self, password: &str) -> Result<(), Error> {
-        self.raw(format!("PASS {}", password))
-    }
-
-    /// PRIVMSG command.
-    pub fn privmsg(&self, target: &str, text: &str) -> Result<(), Error> {
-        self.raw(format!("PRIVMSG {} :{}", target, text))
-    }
-
-    /// JOIN command.
-    pub fn join(&self, channel: &str, password: Option<&str>) -> Result<(), Error> {
-        match password {
-            None => self.raw(format!("JOIN {}", channel)),
-            Some(password) => self.raw(format!("JOIN {} {}", channel, password)),
+    fn raw<S: AsRef<str>>(&self, raw: S) -> Result<(), Error> {
+        let raw = raw.as_ref();
+        if raw.contains("\n") || raw.contains("\r") {
+            return Err(Error::Multiline)
         }
-    }
-
-    /// PART command.
-    pub fn part(&self, channel: &str, message: Option<&str>) -> Result<(), Error> {
-        match message {
-            None => self.raw(format!("PART {}", channel)),
-            Some(message) => self.raw(format!("PART {} :{}", channel, message)),
-        }
-    }
-
-    /// QUIT command.
-    pub fn quit(&self, message: Option<&str>) -> Result<(), Error> {
-        match message {
-            None => self.raw(format!("QUIT :No message")),
-            Some(message) => self.raw(format!("QUIT :{}", message)),
-        }
-    }
-
-    /// Retrive the topic of a given channel.
-    ///
-    /// The `topic` event will receive the information.
-    pub fn get_topic(&self, channel: &str) -> Result<(), Error> {
-        self.raw(format!("TOPIC {}", channel))
-    }
-
-    /// Set the topic of a channel.
-    ///
-    /// To remove the topic of a channel, use an empty topic string.
-    /// It will also trigger a `topic_change` event.
-    pub fn set_topic(&self, channel: &str, topic: &str) -> Result<(), Error> {
-        self.raw(format!("TOPIC {} :{}", channel, topic))
-    }
-
-    /// KICK command.
-    pub fn kick(&self, channel: &str, nickname: &str) -> Result<(), Error> {
-        self.raw(format!("KICK {} {}", channel, nickname))
+        try!(self.writer.raw(format!("{}\n", raw)));
+        Ok(())
     }
 
 }

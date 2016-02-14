@@ -18,7 +18,8 @@ mod listener;
 mod settings;
 
 pub use core::{dispatch};
-pub use core::{Channel, ConnectionStatus, Error, Irc, ChannelUser, ChannelUserStatus};
+pub use core::{Channel, ConnectionStatus, Error, Irc, IrcWrite, DeferredWriter, ChannelUser,
+                ChannelUserStatus};
 pub use listener::Listener;
 pub use settings::Settings;
 pub use loirc::Error as LoircError;

@@ -1,6 +1,6 @@
 [package]
 name = "hiirc"
-version = "0.2.1"
+version = "0.3.0"
 authors = ["Simon Bernier St-Pierre <sbernierstpierre@gmail.com>"]
 description = "High-level and featureful IRC client library with ease of use in mind."
 documentation = "https://sbstp.github.io/hiirc/hiirc/"
