@@ -12,6 +12,9 @@
 extern crate hiirc;
 extern crate time;
 
+use std::thread;
+use std::sync::Arc;
+
 use hiirc::*;
 use time::Duration;
 
@@ -25,27 +28,34 @@ static REALNAME: &'static str = "Fifteen should stop timing out";
 
 impl Listener for Fifteen {
 
-    fn any(&mut self, irc: &Irc, event: &Event) {
+    fn any(&mut self, irc: Arc<Irc>, event: &Event) {
         println!("{:?}", event);
     }
 
-    fn channel_msg(&mut self, irc: &Irc, channel: &Channel, user: &ChannelUser, msg: &str) {
+    fn channel_msg(&mut self, irc: Arc<Irc>, channel: Arc<Channel>, user: Arc<ChannelUser>, msg: &str) {
         if msg.starts_with(NICKNAME) {
             self.reply_to_ping = false;
+            thread::spawn(move || {
+
+                thread::sleep(std::time::Duration::from_secs(2));
+                irc.close();
+                println!("closezo");
+            });
+            println!("donezo");
         }
     }
 
-    fn ping(&mut self, irc: &Irc, server: &str) {
+    fn ping(&mut self, irc: Arc<Irc>, server: &str) {
         if self.reply_to_ping {
             irc.pong(server);
         }
     }
 
-    fn reconnect(&mut self, irc: &Irc) {
+    fn reconnect(&mut self, irc: Arc<Irc>) {
         self.reply_to_ping = true;
     }
 
-    fn welcome(&mut self, irc: &Irc) {
+    fn welcome(&mut self, irc: Arc<Irc>) {
         irc.join("#SexManiac", None);
     }
 

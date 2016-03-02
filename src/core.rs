@@ -1,96 +1,11 @@
 use std::collections::HashMap;
 use std::io;
-use std::slice::Iter;
+use std::sync::{Arc, Mutex};
 
 use listener::Listener;
 use settings::Settings;
 use loirc::{self, connect};
 use loirc::{ActivityMonitor, Code, Event, Message, Prefix, Writer};
-
-/// Represents the status of a user inside of a channel.
-#[derive(Clone, Copy, Debug, Eq, PartialEq)]
-pub enum ChannelUserStatus {
-    /// User has special status.
-    Normal,
-    /// User has voice status.
-    Voice,
-    /// User has operator status.
-    Operator,
-    /// User has owner status.
-    Owner,
-}
-
-/// Represents a user inside of a channel.
-#[derive(Debug)]
-pub struct ChannelUser {
-    /// Nickname of the user.
-    pub nickname: String,
-    /// Status of the user inside the channel.
-    pub status: ChannelUserStatus,
-}
-
-impl ChannelUser {
-
-    fn from_raw(raw: &str) -> ChannelUser {
-        let status = match raw.chars().next() {
-            Some('&') => ChannelUserStatus::Owner,
-            Some('@') => ChannelUserStatus::Operator,
-            Some('+') => ChannelUserStatus::Voice,
-            _ => ChannelUserStatus::Normal,
-        };
-        ChannelUser {
-            nickname: (if status == ChannelUserStatus::Normal { raw } else { &raw[1..] }).into(),
-            status: status,
-        }
-    }
-}
-
-/// Represents a channel.
-#[derive(Debug)]
-pub struct Channel {
-    users: Vec<ChannelUser>,
-    /// Name of the channel.
-    pub name: String,
-    /// Topic of the channel.
-    pub topic: Option<String>,
-}
-
-impl Channel {
-
-    /// Get a user by nickname from this channel.
-    pub fn get_user(&self, nickname: &str) -> Option<&ChannelUser> {
-        match self.users.iter().position(|u| u.nickname == nickname) {
-            Some(idx) => Some(&self.users[idx]),
-            None => None,
-        }
-    }
-
-    /// Get a mutable reference to a user by nickname.
-    fn get_user_mut(&mut self, nickname: &str) -> Option<&mut ChannelUser> {
-        match self.users.iter_mut().position(|u| u.nickname == nickname) {
-            Some(idx) => Some(&mut self.users[idx]),
-            None => None,
-        }
-    }
-
-    /// Get an iterator that iterates over the channel's users.
-    pub fn users(&self) -> Iter<ChannelUser> {
-        self.users.iter()
-    }
-
-}
-/// Status of the connection.
-#[derive(Debug)]
-pub enum ConnectionStatus {
-    /// Connection was closed.
-    Closed(&'static str),
-    /// Connection is alive.
-    Connected,
-    /// Connection was dropped.
-    Disconnected,
-    /// Attempting to reconnect.
-    Reconnecting,
-}
 
 /// Errors that can occur.
 #[derive(Debug)]
@@ -215,99 +130,179 @@ pub trait IrcWrite {
 
 }
 
-/// Represents the state of this connection.
+/// Status of a user inside a channel.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum ChannelUserStatus {
+    /// User has special status.
+    Normal,
+    /// User has voice status.
+    Voice,
+    /// User has operator status.
+    Operator,
+    /// User has owner status.
+    Owner,
+}
+
+/// User inside a channel.
+///
+/// Note that the same person might be in many channels. In any case, there will
+/// be a ChannelUser object for each Channel the person is in.
+#[derive(Debug)]
+pub struct ChannelUser {
+    /// Nickname of the user.
+    nickname: Mutex<Arc<String>>,
+    /// Status of the user inside the channel.
+    status: Mutex<ChannelUserStatus>,
+}
+
+impl ChannelUser {
+
+    fn new(nickname: &str, status: ChannelUserStatus) -> ChannelUser {
+        ChannelUser {
+            nickname: Mutex::new(Arc::new(nickname.into())),
+            status: Mutex::new(status),
+        }
+    }
+
+    fn from_raw(raw: &str) -> ChannelUser {
+        let status = match raw.chars().next() {
+            Some('&') => ChannelUserStatus::Owner,
+            Some('@') => ChannelUserStatus::Operator,
+            Some('+') => ChannelUserStatus::Voice,
+            _ => ChannelUserStatus::Normal,
+        };
+
+        let nickname = if status == ChannelUserStatus::Normal {
+            raw
+        } else {
+            &raw[1..]
+        };
+
+        ChannelUser::new(nickname, status)
+    }
+
+    /// Get the nickname of the user.
+    pub fn nickname(&self) -> Arc<String> {
+        self.nickname.lock().unwrap().clone()
+    }
+
+    /// Get the status of the user.
+    pub fn status(&self) -> ChannelUserStatus {
+        *self.status.lock().unwrap()
+    }
+
+    fn set_nickname(&self, nickname: &str) {
+        *self.nickname.lock().unwrap() = Arc::new(nickname.into());
+    }
+
+    fn set_status(&self, status: ChannelUserStatus) {
+        *self.status.lock().unwrap() = status;
+    }
+
+}
+
+/// Channel
+#[derive(Debug)]
+pub struct Channel {
+    users: Mutex<Vec<Arc<ChannelUser>>>,
+    /// Name of the channel.
+    name: String,
+    /// Topic of the channel.
+    topic: Mutex<Option<Arc<String>>>,
+}
+
+impl Channel {
+
+    fn new(name: &str) -> Channel {
+        Channel {
+            users: Mutex::new(Vec::new()),
+            name: name.into(),
+            topic: Mutex::new(None),
+        }
+    }
+
+    /// Get the name of the channel.
+    pub fn name(&self) -> &str {
+        &self.name
+    }
+
+    /// Get the topic of the channel.
+    pub fn topic(&self) -> Option<Arc<String>> {
+        self.topic.lock().unwrap().clone()
+    }
+
+    /// Get a ChannelUser object from this channel using the user's nickname.
+    pub fn user(&self, nickname: &str) -> Option<Arc<ChannelUser>> {
+        let users = self.users.lock().unwrap();
+
+        for user in users.iter() {
+            if *user.nickname() == nickname {
+                return Some(user.clone());
+            }
+        }
+
+        None
+    }
+
+    /// Get the list of users in this channel.
+    pub fn users(&self) -> Vec<Arc<ChannelUser>> {
+        self.users.lock().unwrap().clone()
+    }
+
+    fn add_user(&self, user: Arc<ChannelUser>) {
+        self.users.lock().unwrap().push(user);
+    }
+
+    fn remove_user(&self, nickname: &str) -> Option<Arc<ChannelUser>> {
+        let mut users = self.users.lock().unwrap();
+
+        if let Some(pos) = users.iter().position(|u| *u.nickname() == nickname) {
+            Some(users.remove(pos))
+        } else {
+            None
+        }
+    }
+
+    fn set_topic(&self, topic: &str) {
+        *self.topic.lock().unwrap() = if topic.is_empty() {
+            None
+        } else {
+            Some(Arc::new(topic.into()))
+        };
+    }
+
+}
+
+/// Status of the connection.
+#[derive(Clone, Copy, Debug)]
+pub enum ConnectionStatus {
+    /// Connection was closed.
+    Closed(&'static str),
+    /// Connection is alive.
+    Connected,
+    /// Connection was dropped.
+    Disconnected,
+    /// Attempting to reconnect.
+    Reconnecting,
+}
+
+/// Contains the connection to the server and the data about channels and users.
 pub struct Irc {
     writer: Writer,
-    channels: HashMap<String, Channel>,
-    /// Status of the connection.
-    pub status: ConnectionStatus,
+    channels: Mutex<HashMap<String, Arc<Channel>>>,
+    status: Mutex<ConnectionStatus>,
 }
 
 impl Irc {
 
-    fn new(writer: Writer) -> Irc {
-        Irc {
-            writer: writer,
-            status: ConnectionStatus::Connected,
-            channels: HashMap::new(),
-        }
-    }
-
     /// Get a channel by name.
-    pub fn get_channel_by_name(&self, name: &str) -> Option<&Channel> {
+    pub fn channel(&self, name: &str) -> Option<Arc<Channel>> {
         self.get_channel_by_id(&name.to_lowercase())
     }
 
-    /// Get a reference to a channel by id.
-    fn get_channel_by_id(&self, id: &str) -> Option<&Channel> {
-        self.channels.get(id)
-    }
-
-    // Ensure a channel if it does not exist.
-    fn ensure_channel_exists(&mut self, name: &str, id: &str) {
-        if !self.channels.contains_key(id) {
-            self.channels.insert(id.into(), Channel {
-                name: name.into(),
-                users: Vec::new(),
-                topic: None,
-            });
-        }
-    }
-
-    fn channel_set_topic(&mut self, channel_id: &str, topic: &str) {
-        let channel = some_or_return!(self.channels.get_mut(channel_id));
-        channel.topic = if topic.len() == 0 {
-            None
-        } else {
-            Some(topic.into())
-        };
-    }
-
-    fn channel_add_user(&mut self, channel_id: &str, raw: &str) {
-        let channel = some_or_return!(self.channels.get_mut(channel_id));
-        channel.users.push(ChannelUser::from_raw(raw));
-    }
-
-    fn channel_del_user(&mut self, channel_id: &str, nickname: &str) -> Option<ChannelUser> {
-        if let Some(channel) = self.channels.get_mut(channel_id) {
-            if let Some(pos) = channel.users.iter().position(|u| u.nickname == nickname) {
-                return Some(channel.users.remove(pos));
-            }
-        }
-        None
-    }
-
-    fn channel_update_user_mode(&mut self, channel_id: &str, nickname: &str, mode: &str) -> Option<(ChannelUserStatus, ChannelUserStatus)> {
-        if let Some(channel) = self.channels.get_mut(channel_id) {
-            if let Some(user) = channel.get_user_mut(nickname) {
-                let old_status = user.status;
-
-                match user.status {
-                    ChannelUserStatus::Normal => {
-                        match &mode[..] {
-                            "+v" => user.status = ChannelUserStatus::Voice,
-                            "+o" => user.status = ChannelUserStatus::Operator,
-                            _ => (),
-                        }
-                    }
-                    ChannelUserStatus::Voice => {
-                        match &mode[..] {
-                            "-v" => user.status = ChannelUserStatus::Normal,
-                            _ => (),
-                        }
-                    }
-                    ChannelUserStatus::Operator | ChannelUserStatus::Owner => {
-                        match &mode[..] {
-                            "-o" => user.status = ChannelUserStatus::Normal,
-                            _ => (),
-                        }
-                    }
-                }
-
-                return Some((old_status, user.status));
-            }
-        }
-        None
+    /// Get the list of channels.
+    pub fn channels(&self) -> Vec<Arc<Channel>> {
+        self.channels.lock().unwrap().values().map(|v| v.clone()).collect::<Vec<Arc<Channel>>>()
     }
 
     /// Check if the underlying connection is closed.
@@ -321,40 +316,86 @@ impl Irc {
         Ok(())
     }
 
-    /// Create a DeferredWriter that shares this connection.
-    pub fn deferred(&self) -> DeferredWriter {
-        DeferredWriter {
-            writer: self.writer.clone(),
+    fn new(writer: Writer) -> Irc {
+        Irc {
+            writer: writer,
+            status: Mutex::new(ConnectionStatus::Connected),
+            channels: Mutex::new(HashMap::new()),
         }
+    }
+
+    fn get_channel_by_id(&self, id: &str) -> Option<Arc<Channel>> {
+        self.channels.lock().unwrap().get(id).map(|c| c.clone())
+    }
+
+    fn ensure_channel_exists(&self, name: &str, id: &str) {
+        self.channels.lock().unwrap().entry(id.into()).or_insert(Arc::new(Channel::new(name)));
+    }
+
+    fn channel_set_topic(&self, channel_id: &str, topic: &str) {
+        let mut channels = self.channels.lock().unwrap();
+
+        let channel = some_or_return!(channels.get_mut(channel_id));
+        channel.set_topic(topic.into());
+    }
+
+    fn channel_add_user(&self, channel_id: &str, raw: &str) {
+        let mut channels = self.channels.lock().unwrap();
+        let channel = some_or_return!(channels.get_mut(channel_id));
+        channel.add_user(Arc::new(ChannelUser::from_raw(raw)));
+    }
+
+    fn channel_del_user(&self, channel_id: &str, nickname: &str) -> Option<Arc<ChannelUser>> {
+        if let Some(channel) = self.get_channel_by_id(channel_id) {
+            channel.remove_user(nickname);
+        }
+        None
+    }
+
+    fn channel_update_user_mode(&self, channel_id: &str, nickname: &str, mode: &str) -> Option<(ChannelUserStatus, ChannelUserStatus)> {
+        if let Some(channel) = self.get_channel_by_id(channel_id) {
+            if let Some(user) = channel.user(nickname) {
+                let old_status = user.status();
+
+                match old_status {
+                    ChannelUserStatus::Normal => {
+                        match &mode[..] {
+                            "+v" => user.set_status(ChannelUserStatus::Voice),
+                            "+o" => user.set_status(ChannelUserStatus::Operator),
+                            _ => (),
+                        }
+                    }
+                    ChannelUserStatus::Voice => {
+                        match &mode[..] {
+                            "-v" => user.set_status(ChannelUserStatus::Normal),
+                            _ => (),
+                        }
+                    }
+                    ChannelUserStatus::Operator | ChannelUserStatus::Owner => {
+                        match &mode[..] {
+                            "-o" => user.set_status(ChannelUserStatus::Normal),
+                            _ => (),
+                        }
+                    }
+                }
+
+                return Some((old_status, user.status()));
+            }
+        }
+        None
+    }
+
+    fn clear_channels(&self) {
+        self.channels.lock().unwrap().clear();
+    }
+
+    fn set_status(&self, status: ConnectionStatus) {
+        *self.status.lock().unwrap() = status;
     }
 
 }
 
 impl IrcWrite for Irc {
-
-    fn raw<S: AsRef<str>>(&self, raw: S) -> Result<(), Error> {
-        let raw = raw.as_ref();
-        if raw.contains("\n") || raw.contains("\r") {
-            return Err(Error::Multiline)
-        }
-        try!(self.writer.raw(format!("{}\n", raw)));
-        Ok(())
-    }
-
-}
-
-/// The DeferredWriter can send commands to the irc server.
-///
-/// The difference with the Irc struct is that the DeferredWriter contains no data
-/// about the state and channels. This means that it can be cloned without any fear
-/// and used at any time. This is useful when calling methods that might block for
-/// a while. You can call them in a seperate thread and not block the event loop.
-#[derive(Clone)]
-pub struct DeferredWriter {
-    writer: Writer,
-}
-
-impl IrcWrite for DeferredWriter {
 
     fn raw<S: AsRef<str>>(&self, raw: S) -> Result<(), Error> {
         let raw = raw.as_ref();
@@ -381,7 +422,7 @@ pub fn dispatch<L: Listener>(listener: L, settings: Settings) -> Result<(), Erro
     let mut dispatch = Dispatch {
         am: settings.monitor.map(|s| ActivityMonitor::new(&writer, s)),
         listener: Box::new(listener),
-        irc: irc,
+        irc: Arc::new(irc),
         settings: settings,
     };
 
@@ -395,7 +436,7 @@ pub fn dispatch<L: Listener>(listener: L, settings: Settings) -> Result<(), Erro
 struct Dispatch<'a> {
     am: Option<ActivityMonitor>,
     listener: Box<Listener + 'a>,
-    irc: Irc,
+    irc: Arc<Irc>,
     settings: Settings<'a>,
 }
 
@@ -407,38 +448,38 @@ impl<'a> Dispatch<'a> {
             am.feed(event);
         }
 
-        self.listener.any(&self.irc, event);
+        self.listener.any(self.irc.clone(), event);
 
         match *event {
             Event::Closed(reason) => {
-                self.irc.status = ConnectionStatus::Closed(reason);
-                self.listener.close(&self.irc, reason);
+                self.irc.set_status(ConnectionStatus::Closed(reason));
+                self.listener.close(self.irc.clone(), reason);
             }
             Event::Disconnected => {
-                self.irc.status = ConnectionStatus::Disconnected;
-                self.irc.channels.clear();
-                self.listener.disconnect(&self.irc);
+                self.irc.set_status(ConnectionStatus::Disconnected);
+                self.irc.clear_channels();
+                self.listener.disconnect(self.irc.clone());
             }
             Event::Reconnecting => {
-                self.irc.status = ConnectionStatus::Reconnecting;
-                self.listener.reconnecting(&self.irc);
+                self.irc.set_status(ConnectionStatus::Reconnecting);
+                self.listener.reconnecting(self.irc.clone());
             }
             Event::Reconnected => {
-                self.irc.status = ConnectionStatus::Connected;
+                self.irc.set_status(ConnectionStatus::Connected);
                 if self.settings.auto_ident {
                     let _ = self.irc.user(self.settings.username, self.settings.realname);
                     let _ = self.irc.nick(self.settings.nickname);
                 }
-                self.listener.reconnect(&self.irc);
+                self.listener.reconnect(self.irc.clone());
             }
             Event::Message(ref msg) => {
-                self.listener.msg(&self.irc, &msg);
+                self.listener.msg(self.irc.clone(), &msg);
                 if msg.code.is_error() {
-                    self.listener.error_msg(&self.irc, &msg.code, &msg);
+                    self.listener.error_msg(self.irc.clone(), &msg.code, &msg);
                 }
                 match msg.code {
                     Code::RplWelcome => {
-                        self.listener.welcome(&self.irc);
+                        self.listener.welcome(self.irc.clone());
                     }
                     Code::RplNamreply => {
                         self.name_reply(msg);
@@ -505,8 +546,8 @@ impl<'a> Dispatch<'a> {
 
     fn end_name_reply(&mut self, msg: &Message) {
         let channel_name = some_or_return!(msg.args.get(1));
-        let channel = some_or_return!(self.irc.get_channel_by_name(&channel_name));
-        self.listener.channel_join(&self.irc, channel);
+        let channel = some_or_return!(self.irc.channel(&channel_name));
+        self.listener.channel_join(self.irc.clone(), channel);
     }
 
     fn topic(&mut self, msg: &Message) {
@@ -518,7 +559,7 @@ impl<'a> Dispatch<'a> {
         self.irc.channel_set_topic(&channel_id, topic);
 
         let channel = some_or_return!(self.irc.get_channel_by_id(&channel_id));
-        self.listener.topic_change(&self.irc, channel, channel.topic.as_ref().map(|t| &t[..]));
+        self.listener.topic_change(self.irc.clone(), channel.clone(), channel.topic());
     }
 
     fn rpl_topic(&mut self, msg: &Message) {
@@ -530,7 +571,7 @@ impl<'a> Dispatch<'a> {
         self.irc.channel_set_topic(&channel_id, topic);
 
         let channel = some_or_return!(self.irc.get_channel_by_id(&channel_id));
-        self.listener.topic(&self.irc, channel, channel.topic.as_ref().map(|t| &t[..]));
+        self.listener.topic(self.irc.clone(), channel.clone(), channel.topic());
     }
 
     fn rpl_no_topic(&mut self, msg: &Message) {
@@ -541,7 +582,7 @@ impl<'a> Dispatch<'a> {
         self.irc.channel_set_topic(&channel_id, "");
 
         let channel = some_or_return!(self.irc.get_channel_by_id(&channel_id));
-        self.listener.topic(&self.irc, channel, channel.topic.as_ref().map(|t| &t[..]));
+        self.listener.topic(self.irc.clone(), channel, None);
     }
 
     fn join(&mut self, msg: &Message) {
@@ -552,8 +593,8 @@ impl<'a> Dispatch<'a> {
         self.irc.channel_add_user(&channel_id, &prefix.nickname);
 
         let channel = some_or_return!(self.irc.get_channel_by_id(&channel_id));
-        let user = some_or_return!(channel.get_user(&prefix.nickname));
-        self.listener.user_join(&self.irc, channel, user);
+        let user = some_or_return!(channel.user(&prefix.nickname));
+        self.listener.user_join(self.irc.clone(), channel, user);
     }
 
     fn part(&mut self, msg: &Message) {
@@ -564,8 +605,8 @@ impl<'a> Dispatch<'a> {
         self.irc.channel_del_user(&channel_id, &prefix.nickname);
 
         let channel = some_or_return!(self.irc.get_channel_by_id(&channel_id));
-        let user = some_or_return!(channel.get_user(&prefix.nickname));
-        self.listener.user_part(&self.irc, channel, user);
+        let user = some_or_return!(channel.user(&prefix.nickname));
+        self.listener.user_part(self.irc.clone(), channel, user);
     }
 
     fn message(&mut self, msg: &Message, notice: bool) {
@@ -574,18 +615,18 @@ impl<'a> Dispatch<'a> {
         let source = some_or_return!(msg.args.get(0));
 
         if source.starts_with("#") {
-            let channel = some_or_return!(self.irc.get_channel_by_name(&source));
-            let user = some_or_return!(channel.get_user(&prefix.nickname));
+            let channel = some_or_return!(self.irc.channel(&source));
+            let user = some_or_return!(channel.user(&prefix.nickname));
             if !notice {
-                self.listener.channel_msg(&self.irc, channel, user, text);
+                self.listener.channel_msg(self.irc.clone(), channel, user, text);
             } else {
-                self.listener.channel_notice(&self.irc, channel, user, text);
+                self.listener.channel_notice(self.irc.clone(), channel, user, text);
             }
         } else {
             if !notice {
-                self.listener.private_msg(&self.irc, &prefix.nickname, text);
+                self.listener.private_msg(self.irc.clone(), &prefix.nickname, text);
             } else {
-                self.listener.private_notice(&self.irc, &prefix.nickname, text);
+                self.listener.private_notice(self.irc.clone(), &prefix.nickname, text);
             }
         }
     }
@@ -593,28 +634,24 @@ impl<'a> Dispatch<'a> {
     fn quit(&mut self, msg: &Message) {
         let user = user_or_return!(msg.prefix);
 
-        for (_, channel) in self.irc.channels.iter_mut() {
-            if let Some(pos) = channel.users.iter().position(|u| u.nickname == user.nickname) {
-                channel.users.remove(pos);
-            }
+        for channel in self.irc.channels() {
+            channel.remove_user(&user.nickname);
         }
 
-        self.listener.user_quit(&self.irc, &user.nickname);
+        self.listener.user_quit(self.irc.clone(), &user.nickname);
     }
 
     fn nick(&mut self, msg: &Message) {
         let prefix = user_or_return!(msg.prefix);
         let newname = some_or_return!(msg.args.last());
 
-        for (_, channel) in self.irc.channels.iter_mut() {
-            for user in channel.users.iter_mut() {
-                if user.nickname == prefix.nickname {
-                    user.nickname = newname.clone();
-                }
+        for channel in self.irc.channels() {
+            if let Some(user) = channel.user(&prefix.nickname) {
+                user.set_nickname(newname);
             }
         }
 
-        self.listener.nick_change(&self.irc, &prefix.nickname, &newname);
+        self.listener.nick_change(self.irc.clone(), &prefix.nickname, &newname);
     }
 
     fn kick(&mut self, msg: &Message) {
@@ -624,7 +661,7 @@ impl<'a> Dispatch<'a> {
 
         let channel_user = some_or_return!(self.irc.channel_del_user(&channel_id, kicked_user));
         let channel = some_or_return!(self.irc.get_channel_by_id(&channel_id));
-        self.listener.kick(&self.irc, &channel, &channel_user);
+        self.listener.kick(self.irc.clone(), channel, channel_user);
     }
 
     fn ping(&mut self, msg: &Message) {
@@ -632,12 +669,12 @@ impl<'a> Dispatch<'a> {
         if self.settings.auto_ping {
             let _ = self.irc.pong(server);
         }
-        self.listener.ping(&self.irc, server);
+        self.listener.ping(self.irc.clone(), server);
     }
 
     fn pong(&mut self, msg: &Message) {
         let server = some_or_return!(msg.args.last());
-        self.listener.pong(&self.irc, server);
+        self.listener.pong(self.irc.clone(), server);
     }
 
     fn mode(&mut self, msg: &Message) {
@@ -649,8 +686,9 @@ impl<'a> Dispatch<'a> {
         if let Some((old_status, new_status)) = self.irc.channel_update_user_mode(&channel_id, nickname, mode) {
             if old_status != new_status {
                 let channel = some_or_return!(self.irc.get_channel_by_id(&channel_id));
-                let user = some_or_return!(channel.get_user(nickname));
-                self.listener.user_mode_change(&self.irc, &channel, &user, old_status, user.status)
+                let user = some_or_return!(channel.user(nickname));
+                let status = user.status();
+                self.listener.user_mode_change(self.irc.clone(), channel, user, old_status, status);
             }
         }
     }
@@ -660,27 +698,44 @@ impl<'a> Dispatch<'a> {
 #[test]
 fn test_user_from_raw_norm() {
     let user = ChannelUser::from_raw("TEST");
-    assert_eq!(&user.nickname, "TEST");
-    assert_eq!(user.status, ChannelUserStatus::Normal);
+    assert_eq!(&*user.nickname(), "TEST");
+    assert_eq!(user.status(), ChannelUserStatus::Normal);
 }
 
 #[test]
 fn test_user_from_raw_voice() {
     let user = ChannelUser::from_raw("+TEst");
-    assert_eq!(&user.nickname, "TEst");
-    assert_eq!(user.status, ChannelUserStatus::Voice);
+    assert_eq!(&*user.nickname(), "TEst");
+    assert_eq!(user.status(), ChannelUserStatus::Voice);
 }
 
 #[test]
 fn test_user_from_raw_op() {
     let user = ChannelUser::from_raw("@test");
-    assert_eq!(&user.nickname, "test");
-    assert_eq!(user.status, ChannelUserStatus::Operator);
+    assert_eq!(&*user.nickname(), "test");
+    assert_eq!(user.status(), ChannelUserStatus::Operator);
 }
 
 #[test]
 fn test_user_from_raw_owner() {
     let user = ChannelUser::from_raw("&test");
-    assert_eq!(&user.nickname, "test");
-    assert_eq!(user.status, ChannelUserStatus::Owner);
+    assert_eq!(&*user.nickname(), "test");
+    assert_eq!(user.status(), ChannelUserStatus::Owner);
+}
+
+#[test]
+fn test_channel() {
+    let channel = Channel::new("#testchannel");
+    channel.set_topic("ABC DEF");
+
+    let usr1 = Arc::new(ChannelUser::new("abc1", ChannelUserStatus::Normal));
+    let usr2 = Arc::new(ChannelUser::new("abc2", ChannelUserStatus::Operator));
+
+    channel.add_user(usr1.clone());
+    channel.add_user(usr2.clone());
+
+    assert_eq!(channel.name(), "#testchannel");
+    assert_eq!(channel.topic(), Some(Arc::new("ABC DEF".into())));
+    assert_eq!(channel.user("abc1").unwrap().nickname(), usr1.nickname());
+    assert_eq!(channel.user("abc2").unwrap().nickname(), usr2.nickname());
 }
