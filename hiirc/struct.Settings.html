@@ -9,6 +9,7 @@
 
     <title>hiirc::Settings - Rust</title>
 
+    <link rel="stylesheet" type="text/css" href="../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../main.css">
 
     
@@ -45,18 +46,18 @@
             <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                 [<span class='inner'>&#x2212;</span>]
             </a>
-        </span><a id='src-639' class='srclink' href='../src/hiirc/settings.rs.html#8-29' title='goto source code'>[src]</a></span></h1>
+        </span><a id='src-669' class='srclink' href='../src/hiirc/settings.rs.html#8-29' title='goto source code'>[src]</a></span></h1>
 <pre class='rust struct'>pub struct Settings&lt;'a&gt; {
-    pub addr: &amp;'a <a href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>,
-    pub nickname: &amp;'a <a href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>,
-    pub username: &amp;'a <a href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>,
-    pub realname: &amp;'a <a href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>,
+    pub addr: &amp;'a <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>,
+    pub nickname: &amp;'a <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>,
+    pub username: &amp;'a <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>,
+    pub realname: &amp;'a <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>,
     pub reconnection: <a class='enum' href='../hiirc/enum.ReconnectionSettings.html' title='hiirc::ReconnectionSettings'>ReconnectionSettings</a>,
     pub monitor: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='struct' href='../hiirc/struct.MonitorSettings.html' title='hiirc::MonitorSettings'>MonitorSettings</a>&gt;,
-    pub auto_ident: <a href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a>,
-    pub auto_ping: <a href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a>,
+    pub auto_ident: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a>,
+    pub auto_ping: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a>,
     pub encoding: <a class='type' href='../encoding/types/type.EncodingRef.html' title='encoding::types::EncodingRef'>EncodingRef</a>,
-    pub password: &amp;'a <a href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>,
+    pub password: &amp;'a <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>,
 }</pre><div class='docblock'><p>Settings for the dispatcher.</p>
 </div><h2 class='fields'>Fields</h2>
 <table><tr class='stab '>
@@ -79,7 +80,7 @@
                                   <td id='structfield.encoding'><code>encoding</code></td><td><div class='docblock'><p>Encoding used for the connection.</p>
 </div></td></tr><tr class='stab '>
                                   <td id='structfield.password'><code>password</code></td><td><div class='docblock'><p>Server password</p>
-</div></td></tr></table><h2 id='methods'>Methods</h2><h3 class='impl'><code>impl&lt;'a&gt; <a class='struct' href='../hiirc/struct.Settings.html' title='hiirc::Settings'>Settings</a>&lt;'a&gt;</code></h3><div class='impl-items'><h4 id='method.new' class='method'><code>fn <a href='#method.new' class='fnname'>new</a>&lt;'b&gt;(addr: &amp;'b <a href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>, nickname: &amp;'b <a href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>) -&gt; <a class='struct' href='../hiirc/struct.Settings.html' title='hiirc::Settings'>Settings</a>&lt;'b&gt;</code></h4>
+</div></td></tr></table><h2 id='methods'>Methods</h2><h3 class='impl'><code>impl&lt;'a&gt; <a class='struct' href='../hiirc/struct.Settings.html' title='hiirc::Settings'>Settings</a>&lt;'a&gt;</code></h3><div class='impl-items'><h4 id='method.new' class='method'><code>fn <a href='#method.new' class='fnname'>new</a>&lt;'b&gt;(addr: &amp;'b <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>, nickname: &amp;'b <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>) -&gt; <a class='struct' href='../hiirc/struct.Settings.html' title='hiirc::Settings'>Settings</a>&lt;'b&gt;</code></h4>
 <div class='docblock'><p>Create new settings with sensible default values.</p>
 
 <p>The default values are:</p>
@@ -91,23 +92,23 @@
 <span class='ident'>auto_ident</span>: <span class='boolval'>true</span>,
 <span class='ident'>auto_ping</span>: <span class='boolval'>true</span>,
 <span class='ident'>encoding</span>: <span class='ident'>UTF_8</span>,</pre>
-</div><h4 id='method.username' class='method'><code>fn <a href='#method.username' class='fnname'>username</a>(self, username: &amp;'a <a href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>) -&gt; <a class='struct' href='../hiirc/struct.Settings.html' title='hiirc::Settings'>Settings</a>&lt;'a&gt;</code></h4>
+</div><h4 id='method.username' class='method'><code>fn <a href='#method.username' class='fnname'>username</a>(self, username: &amp;'a <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>) -&gt; <a class='struct' href='../hiirc/struct.Settings.html' title='hiirc::Settings'>Settings</a>&lt;'a&gt;</code></h4>
 <div class='docblock'><p>Modify the username.</p>
-</div><h4 id='method.realname' class='method'><code>fn <a href='#method.realname' class='fnname'>realname</a>(self, realname: &amp;'a <a href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>) -&gt; <a class='struct' href='../hiirc/struct.Settings.html' title='hiirc::Settings'>Settings</a>&lt;'a&gt;</code></h4>
+</div><h4 id='method.realname' class='method'><code>fn <a href='#method.realname' class='fnname'>realname</a>(self, realname: &amp;'a <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>) -&gt; <a class='struct' href='../hiirc/struct.Settings.html' title='hiirc::Settings'>Settings</a>&lt;'a&gt;</code></h4>
 <div class='docblock'><p>Modify the realname.</p>
 </div><h4 id='method.reconnection' class='method'><code>fn <a href='#method.reconnection' class='fnname'>reconnection</a>(self, reconnection: <a class='enum' href='../hiirc/enum.ReconnectionSettings.html' title='hiirc::ReconnectionSettings'>ReconnectionSettings</a>) -&gt; <a class='struct' href='../hiirc/struct.Settings.html' title='hiirc::Settings'>Settings</a>&lt;'a&gt;</code></h4>
 <div class='docblock'><p>Modify the reconnection settings.</p>
 </div><h4 id='method.monitor' class='method'><code>fn <a href='#method.monitor' class='fnname'>monitor</a>(self, monitor: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='struct' href='../hiirc/struct.MonitorSettings.html' title='hiirc::MonitorSettings'>MonitorSettings</a>&gt;) -&gt; <a class='struct' href='../hiirc/struct.Settings.html' title='hiirc::Settings'>Settings</a>&lt;'a&gt;</code></h4>
 <div class='docblock'><p>Modify the monitor settings.</p>
-</div><h4 id='method.auto_ident' class='method'><code>fn <a href='#method.auto_ident' class='fnname'>auto_ident</a>(self, auto_ident: <a href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a>) -&gt; <a class='struct' href='../hiirc/struct.Settings.html' title='hiirc::Settings'>Settings</a>&lt;'a&gt;</code></h4>
+</div><h4 id='method.auto_ident' class='method'><code>fn <a href='#method.auto_ident' class='fnname'>auto_ident</a>(self, auto_ident: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a>) -&gt; <a class='struct' href='../hiirc/struct.Settings.html' title='hiirc::Settings'>Settings</a>&lt;'a&gt;</code></h4>
 <div class='docblock'><p>Enable/disable automatic indentification.</p>
-</div><h4 id='method.auto_ping' class='method'><code>fn <a href='#method.auto_ping' class='fnname'>auto_ping</a>(self, auto_ping: <a href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a>) -&gt; <a class='struct' href='../hiirc/struct.Settings.html' title='hiirc::Settings'>Settings</a>&lt;'a&gt;</code></h4>
+</div><h4 id='method.auto_ping' class='method'><code>fn <a href='#method.auto_ping' class='fnname'>auto_ping</a>(self, auto_ping: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a>) -&gt; <a class='struct' href='../hiirc/struct.Settings.html' title='hiirc::Settings'>Settings</a>&lt;'a&gt;</code></h4>
 <div class='docblock'><p>Enable/disable automatic ping replies.</p>
 </div><h4 id='method.encoding' class='method'><code>fn <a href='#method.encoding' class='fnname'>encoding</a>(self, encoding: <a class='type' href='../encoding/types/type.EncodingRef.html' title='encoding::types::EncodingRef'>EncodingRef</a>) -&gt; <a class='struct' href='../hiirc/struct.Settings.html' title='hiirc::Settings'>Settings</a>&lt;'a&gt;</code></h4>
 <div class='docblock'><p>Modify the encoding used for this connection.</p>
-</div><h4 id='method.password' class='method'><code>fn <a href='#method.password' class='fnname'>password</a>(self, password: &amp;'a <a href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>) -&gt; <a class='struct' href='../hiirc/struct.Settings.html' title='hiirc::Settings'>Settings</a>&lt;'a&gt;</code></h4>
+</div><h4 id='method.password' class='method'><code>fn <a href='#method.password' class='fnname'>password</a>(self, password: &amp;'a <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>) -&gt; <a class='struct' href='../hiirc/struct.Settings.html' title='hiirc::Settings'>Settings</a>&lt;'a&gt;</code></h4>
 <div class='docblock'><p>Modify the server password.</p>
-</div><h4 id='method.dispatch' class='method'><code>fn <a href='#method.dispatch' class='fnname'>dispatch</a>&lt;L&gt;(self, listener: L) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>()</a>, <a class='enum' href='../hiirc/enum.Error.html' title='hiirc::Error'>Error</a>&gt; <span class='where'>where L: <a class='trait' href='../hiirc/trait.Listener.html' title='hiirc::Listener'>Listener</a></span></code></h4>
+</div><h4 id='method.dispatch' class='method'><code>fn <a href='#method.dispatch' class='fnname'>dispatch</a>&lt;L&gt;(self, listener: L) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>()</a>, <a class='enum' href='../hiirc/enum.Error.html' title='hiirc::Error'>Error</a>&gt; <span class='where'>where L: <a class='trait' href='../hiirc/trait.Listener.html' title='hiirc::Listener'>Listener</a></span></code></h4>
 <div class='docblock'><p>Connect to the server and begin dispatching events using the given <code>Listener</code>.</p>
 </div></div></section>
     <section id='search' class="content hidden"></section>
@@ -168,6 +169,6 @@
     <script src="../jquery.js"></script>
     <script src="../main.js"></script>
     
-    <script async src="../search-index.js"></script>
+    <script defer src="../search-index.js"></script>
 </body>
 </html>

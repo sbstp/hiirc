@@ -9,6 +9,7 @@
 
     <title>loirc::connect - Rust</title>
 
+    <link rel="stylesheet" type="text/css" href="../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../main.css">
 
     
@@ -45,8 +46,8 @@
             <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                 [<span class='inner'>&#x2212;</span>]
             </a>
-        </span><a id='src-549' class='srclink' href='../src/loirc/connection.rs.html#359-375' title='goto source code'>[src]</a></span></h1>
-<pre class='rust fn'>pub fn connect&lt;A: <a class='trait' href='https://doc.rust-lang.org/nightly/core/convert/trait.AsRef.html' title='core::convert::AsRef'>AsRef</a>&lt;<a href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>&gt;&gt;(address: A, reco_settings: <a class='enum' href='../loirc/enum.ReconnectionSettings.html' title='loirc::ReconnectionSettings'>ReconnectionSettings</a>, encoding: <a class='type' href='../encoding/types/type.EncodingRef.html' title='encoding::types::EncodingRef'>EncodingRef</a>) -&gt; <a class='type' href='https://doc.rust-lang.org/nightly/std/io/error/type.Result.html' title='std::io::error::Result'>Result</a>&lt;<a href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>(<a class='struct' href='../loirc/struct.Writer.html' title='loirc::Writer'>Writer</a>, <a class='type' href='../loirc/type.Reader.html' title='loirc::Reader'>Reader</a>)</a>&gt;</pre><div class='docblock'><p>Create a connection to the given address.</p>
+        </span><a id='src-746' class='srclink' href='../src/loirc/connection.rs.html#359-375' title='goto source code'>[src]</a></span></h1>
+<pre class='rust fn'>pub fn connect&lt;A: <a class='trait' href='https://doc.rust-lang.org/nightly/core/convert/trait.AsRef.html' title='core::convert::AsRef'>AsRef</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>&gt;&gt;(address: A, reco_settings: <a class='enum' href='../loirc/enum.ReconnectionSettings.html' title='loirc::ReconnectionSettings'>ReconnectionSettings</a>, encoding: <a class='type' href='../encoding/types/type.EncodingRef.html' title='encoding::types::EncodingRef'>EncodingRef</a>) -&gt; <a class='type' href='https://doc.rust-lang.org/nightly/std/io/error/type.Result.html' title='std::io::error::Result'>Result</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>(<a class='struct' href='../loirc/struct.Writer.html' title='loirc::Writer'>Writer</a>, <a class='type' href='../loirc/type.Reader.html' title='loirc::Reader'>Reader</a>)</a>&gt;</pre><div class='docblock'><p>Create a connection to the given address.</p>
 
 <p>A <code>Writer</code>/<code>Reader</code> pair is returned. If the connection fails,
 an error is returned.</p>
@@ -111,6 +112,6 @@ an error is returned.</p>
     <script src="../jquery.js"></script>
     <script src="../main.js"></script>
     
-    <script async src="../search-index.js"></script>
+    <script defer src="../search-index.js"></script>
 </body>
 </html>
