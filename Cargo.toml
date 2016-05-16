@@ -13,7 +13,4 @@ exclude = ["docs.sh"]
 
 [dependencies]
 encoding = "0.2.32"
-loirc = "0.1.4"
-
-[dev-dependencies]
-time = "0.1.32"
+loirc = "0.2"

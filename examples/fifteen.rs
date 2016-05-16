@@ -10,13 +10,12 @@
 #![allow(unused_must_use)]
 
 extern crate hiirc;
-extern crate time;
 
-use std::thread;
 use std::sync::Arc;
+use std::thread;
+use std::time::Duration;
 
 use hiirc::*;
-use time::Duration;
 
 struct Fifteen {
     reply_to_ping: bool,
@@ -67,8 +66,8 @@ fn main() {
         .realname(REALNAME)
         .reconnection(ReconnectionSettings::Reconnect {
             max_attempts: 0,
-            delay_between_attempts: Duration::seconds(5),
-            delay_after_disconnect: Duration::seconds(15),
+            delay_between_attempts: Duration::from_secs(5),
+            delay_after_disconnect: Duration::from_secs(15),
         })
         .auto_ping(false)
         .dispatch(Fifteen{ reply_to_ping: true }).unwrap();
