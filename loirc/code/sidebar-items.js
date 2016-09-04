@@ -1,1 +1,0 @@
-initSidebarItems({"enum":[["Code","Representation of IRC commands, replies and errors."]]});

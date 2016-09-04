@@ -11,6 +11,7 @@
 
     <link rel="stylesheet" type="text/css" href="../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../main.css">
+    
 
     
     
@@ -43,11 +44,11 @@
 
     <section id='main' class="content fn">
 <h1 class='fqn'><span class='in-band'>Function <a href='index.html'>hiirc</a>::<wbr><a class='fn' href=''>dispatch</a></span><span class='out-of-band'><span id='render-detail'>
-            <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
-                [<span class='inner'>&#x2212;</span>]
-            </a>
-        </span><a id='src-323' class='srclink' href='../src/hiirc/core.rs.html#412-434' title='goto source code'>[src]</a></span></h1>
-<pre class='rust fn'>pub fn dispatch&lt;L: <a class='trait' href='../hiirc/trait.Listener.html' title='hiirc::Listener'>Listener</a>&gt;(listener: L, settings: <a class='struct' href='../hiirc/struct.Settings.html' title='hiirc::Settings'>Settings</a>) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>()</a>, <a class='enum' href='../hiirc/enum.Error.html' title='hiirc::Error'>Error</a>&gt;</pre><div class='docblock'><p>Create an irc client with the listener and settings.</p>
+                   <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
+                       [<span class='inner'>&#x2212;</span>]
+                   </a>
+               </span><a id='src-321' class='srclink' href='../src/hiirc/src/core.rs.html#417-439' title='goto source code'>[src]</a></span></h1>
+<pre class='rust fn'>pub fn dispatch&lt;L:&nbsp;<a class='trait' href='../hiirc/trait.Listener.html' title='hiirc::Listener'>Listener</a>&gt;(listener: L, settings: <a class='struct' href='../hiirc/struct.Settings.html' title='hiirc::Settings'>Settings</a>) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>()</a>,&nbsp;<a class='enum' href='../hiirc/enum.Error.html' title='hiirc::Error'>Error</a>&gt;</pre><div class='docblock'><p>Create an irc client with the listener and settings.</p>
 </div></section>
     <section id='search' class="content hidden"></section>
 
@@ -71,6 +72,8 @@
                     <dd>Move down in search results</dd>
                     <dt>&#9166;</dt>
                     <dd>Go to active search result</dd>
+                    <dt>+</dt>
+                    <dd>Collapse/expand all sections</dd>
                 </dl>
             </div>
 
@@ -91,7 +94,7 @@
 
                 <p>
                     Search functions by type signature (e.g.
-                    <code>vec -> usize</code>)
+                    <code>vec -> usize</code> or <code>* -> vec</code>)
                 </p>
             </div>
         </div>

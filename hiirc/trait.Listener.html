@@ -11,6 +11,7 @@
 
     <link rel="stylesheet" type="text/css" href="../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../main.css">
+    
 
     
     
@@ -43,10 +44,10 @@
 
     <section id='main' class="content trait">
 <h1 class='fqn'><span class='in-band'>Trait <a href='index.html'>hiirc</a>::<wbr><a class='trait' href=''>Listener</a></span><span class='out-of-band'><span id='render-detail'>
-            <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
-                [<span class='inner'>&#x2212;</span>]
-            </a>
-        </span><a id='src-557' class='srclink' href='../src/hiirc/listener.rs.html#7-118' title='goto source code'>[src]</a></span></h1>
+                   <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
+                       [<span class='inner'>&#x2212;</span>]
+                   </a>
+               </span><a id='src-545' class='srclink' href='../src/hiirc/src/listener.rs.html#7-118' title='goto source code'>[src]</a></span></h1>
 <pre class='rust trait'>pub trait Listener {
     fn <a href='#method.any' class='fnname'>any</a>(&amp;mut self, irc: <a class='struct' href='https://doc.rust-lang.org/nightly/alloc/arc/struct.Arc.html' title='alloc::arc::Arc'>Arc</a>&lt;<a class='struct' href='../hiirc/struct.Irc.html' title='hiirc::Irc'>Irc</a>&gt;, event: &amp;<a class='enum' href='../hiirc/enum.Event.html' title='hiirc::Event'>Event</a>) { ... }
     fn <a href='#method.msg' class='fnname'>msg</a>(&amp;mut self, irc: <a class='struct' href='https://doc.rust-lang.org/nightly/alloc/arc/struct.Arc.html' title='alloc::arc::Arc'>Arc</a>&lt;<a class='struct' href='../hiirc/struct.Irc.html' title='hiirc::Irc'>Irc</a>&gt;, msg: &amp;<a class='struct' href='../hiirc/struct.Message.html' title='hiirc::Message'>Message</a>) { ... }
@@ -119,8 +120,8 @@ It&#39;s safe to assume that a channel has no topic if this event is not fired w
         <h2 id='implementors'>Implementors</h2>
         <ul class='item-list' id='implementors-list'>
     </ul><script type="text/javascript" async
-                              src="../implementors/hiirc/trait.Listener.js">
-                      </script></section>
+                         src="../implementors/hiirc/trait.Listener.js">
+                 </script></section>
     <section id='search' class="content hidden"></section>
 
     <section class="footer"></section>
@@ -143,6 +144,8 @@ It&#39;s safe to assume that a channel has no topic if this event is not fired w
                     <dd>Move down in search results</dd>
                     <dt>&#9166;</dt>
                     <dd>Go to active search result</dd>
+                    <dt>+</dt>
+                    <dd>Collapse/expand all sections</dd>
                 </dl>
             </div>
 
@@ -163,7 +166,7 @@ It&#39;s safe to assume that a channel has no topic if this event is not fired w
 
                 <p>
                     Search functions by type signature (e.g.
-                    <code>vec -> usize</code>)
+                    <code>vec -> usize</code> or <code>* -> vec</code>)
                 </p>
             </div>
         </div>
