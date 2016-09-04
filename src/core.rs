@@ -84,6 +84,11 @@ pub trait IrcWrite {
         self.raw(format!("PRIVMSG {} :{}", target, text))
     }
 
+    /// NOTICE command.
+    fn notice(&self, target: &str, text: &str) -> Result<(), Error> {
+        self.raw(format!("NOTICE {} :{}", target, text))
+    }
+
     /// JOIN command.
     fn join(&self, channel: &str, password: Option<&str>) -> Result<(), Error> {
         match password {
