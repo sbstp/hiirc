@@ -142,6 +142,8 @@ pub enum ChannelUserStatus {
     Normal,
     /// User has voice status.
     Voice,
+    /// User has half operator status.
+    HalfOperator,
     /// User has operator status.
     Operator,
     /// User has owner status.
@@ -171,7 +173,9 @@ impl ChannelUser {
 
     fn from_raw(raw: &str) -> ChannelUser {
         let status = match raw.chars().next() {
+            Some('~') => ChannelUserStatus::Owner,
             Some('&') => ChannelUserStatus::Owner,
+            Some('%') => ChannelUserStatus::HalfOperator,
             Some('@') => ChannelUserStatus::Operator,
             Some('+') => ChannelUserStatus::Voice,
             _ => ChannelUserStatus::Normal,
@@ -366,6 +370,7 @@ impl Irc {
                     ChannelUserStatus::Normal => {
                         match &mode[..] {
                             "+v" => user.set_status(ChannelUserStatus::Voice),
+                            "+h" => user.set_status(ChannelUserStatus::HalfOperator),
                             "+o" => user.set_status(ChannelUserStatus::Operator),
                             _ => (),
                         }
