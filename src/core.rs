@@ -375,6 +375,12 @@ impl Irc {
                             _ => (),
                         }
                     }
+                    ChannelUserStatus::HalfOperator => {
+                        match &mode[..] {
+                            "-h" => user.set_status(ChannelUserStatus::Normal),
+                            _ => (),
+                        }
+                    },
                     ChannelUserStatus::Voice => {
                         match &mode[..] {
                             "-v" => user.set_status(ChannelUserStatus::Normal),
