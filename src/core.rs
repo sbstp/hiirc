@@ -1,6 +1,9 @@
 use std::collections::HashMap;
 use std::io;
 use std::sync::{Arc, Mutex};
+use std::fmt::{Display, Formatter};
+use std::fmt;
+use std::error;
 
 use listener::Listener;
 use settings::Settings;
@@ -40,6 +43,39 @@ impl From<loirc::Error> for Error {
 impl From<io::Error> for Error {
     fn from(err: io::Error) -> Error {
         Error::IoError(err)
+    }
+}
+
+impl Display for Error {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        match *self {
+            Error::AlreadyClosed => write!(f, "Connection has already been closed"),
+            Error::AlreadyDisconnected => write!(f, "Client has already been disconnected"),
+            Error::Closed => write!(f, "Connection is closed"),
+            Error::Disconnected => write!(f, "Client has been disconnected"),
+            Error::IoError(ref err) => write!(f, "Client encountered I/O error: {}", err),
+            Error::Multiline => write!(f, "Message contains line break")
+        }
+    }
+}
+
+impl error::Error for Error {
+    fn description(&self) -> &str {
+        match *self {
+            Error::AlreadyClosed => "Connection is already closed",
+            Error::AlreadyDisconnected => "Connection is already disconnected",
+            Error::Closed => "Connection has been manually closed",
+            Error::Disconnected => "Connection has been dropped",
+            Error::IoError(ref err) => err.description(),
+            Error::Multiline => "Message contains a line break"
+        }
+    }
+
+    fn cause(&self) -> Option<Error> {
+        match *self {
+            Error::IoError(ref err) => Some(err),
+            _ => None
+        }
     }
 }
 
