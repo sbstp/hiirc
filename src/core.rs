@@ -71,7 +71,7 @@ impl error::Error for Error {
         }
     }
 
-    fn cause(&self) -> Option<Error> {
+    fn cause(&self) -> Option<&error::Error> {
         match *self {
             Error::IoError(ref err) => Some(err),
             _ => None
