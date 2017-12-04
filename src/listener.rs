@@ -1,7 +1,7 @@
 use std::sync::Arc;
 
 use loirc::Event;
-use {Channel, ChannelUser, ChannelUserStatus, Code, Irc, Message};
+use {Channel, ChannelUser, ChannelUserStatus, Code, Irc, Message, PrefixUser};
 
 /// Implement this trait to handle events.
 pub trait Listener {
@@ -74,11 +74,11 @@ pub trait Listener {
 
     /// When a private message is received.
     #[allow(unused_variables)]
-    fn private_msg(&mut self, irc: Arc<Irc>, sender: &str, message: &str) {}
+    fn private_msg(&mut self, irc: Arc<Irc>, sender: &PrefixUser, message: &str) {}
 
     /// When a private notice is received.
     #[allow(unused_variables)]
-    fn private_notice(&mut self, irc: Arc<Irc>, sender: &str, message: &str) {}
+    fn private_notice(&mut self, irc: Arc<Irc>, sender: &PrefixUser, message: &str) {}
 
     /// Reply to a `get_topic` command and when joining a channel.
     ///
