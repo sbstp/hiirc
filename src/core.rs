@@ -676,9 +676,9 @@ impl<'a> Dispatch<'a> {
             }
         } else {
             if !notice {
-                self.listener.private_msg(self.irc.clone(), &prefix.nickname, text);
+                self.listener.private_msg(self.irc.clone(), prefix, text);
             } else {
-                self.listener.private_notice(self.irc.clone(), &prefix.nickname, text);
+                self.listener.private_notice(self.irc.clone(), prefix, text);
             }
         }
     }
